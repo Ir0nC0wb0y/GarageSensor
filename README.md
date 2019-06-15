@@ -1,6 +1,6 @@
 # GarageSensor
 
-This project sets out to create a useable garage sensor using inexpensive parts.
+This project sets out to create a useable garage parking distance sensor using inexpensive parts (easily sourced from AliExpress).
 
 # SW Development Plan:
 
