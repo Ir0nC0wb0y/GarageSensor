@@ -52,6 +52,8 @@ int fset_cnt = 0;
 #define FSET_NUM 10
 
 /*
+// These palettes were used in development, but have been disused in favor of more simple animations.
+
 DEFINE_GRADIENT_PALETTE( too_far ) { // row: palette index, R, G, B
       0,   0, 255,   0,    // Green
      60, 255, 255,   0,    // Yellow
@@ -76,6 +78,7 @@ void setup() {
 }
 
 void loop(){
+	// To reduce the load of analogRead, the set point is only read every FSET_NUM loop iterations.
   if (fset_cnt > FSET_NUM) {
     fSET_dist_set();
     fset_cnt = 0;
@@ -94,21 +97,22 @@ void loop(){
 
 void fGet_Distance(int method) {
   if (method == 1) {
-    // This variable needs to be replaced with a distance in the future, but for now is Analog 1 (A1)
+    // Used for debugging, this mode just reads from analog pin A1
     DIST_read = map(analogRead(A1),0,1023,0,DIST_MAX);
   } else if (method == 2) {
+    // This method uses the ultrasonic sensor defined above for the NewPing library
     int time_read;
-    time_read = sonar.ping_median(MEDIAN_IT);
-    DIST_read = sonar.convert_cm(time_read);
+    time_read = sonar.ping_median(MEDIAN_IT); // reads distance MEDIAN_IT times (to reduce extraneous distance reads)
+    DIST_read = sonar.convert_cm(time_read); // converts the time returned into a usable distance
   }
   if (DEBUG) {Serial.print("DIST_read: "); Serial.println(DIST_read);}
 }
 
 void fState() {
   // Logic to determine state
-  // check for case 0 (Too far away)
   if ( DIST_read > DIST_staging ) {
-    STATE = 0;
+    // check for case 0 (Too far away)
+    STATE = 0; // should this state spawn an action?
   
   } else if (DIST_read <= DIST_staging && DIST_read > DIST_set + DIST_set_range ) {
     // check for case 1 (Staging)
@@ -127,9 +131,9 @@ void fState() {
     STATE = 4;
   
   } else {
-    // Exception case
+    // Exception handling
     STATE = 5;
-    //fANI_Exception;
+    //fANI_Exception; // placeholder for future development
   }
 
   // Move on to next function
