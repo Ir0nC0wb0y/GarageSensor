@@ -28,9 +28,9 @@ CRGB leds[NUM_LEDS];
 
 // Temporary Distance Values
 #define DIST_MAX      140
-#define DIST_THRESH_1  80
-#define DIST_THRESH_2  40
-#define DIST_THRESH_3  18
+#define DIST_THRESH_1  60
+#define DIST_THRESH_2  50
+#define DIST_THRESH_3  40
 #define DIST_MIN        4
 int distance_state = 0;
     //distance states:
@@ -121,7 +121,7 @@ void Do_Display() {
 //void Do_Measurement(int _initial=0);
 void Do_Measurement(int _initial=0) {
   int sensor_start = millis();
-  distanceSensor.startRanging(); //Write configuration bytes to initiate measurement
+  //distanceSensor.startRanging(); //Write configuration bytes to initiate measurement
   while (!distanceSensor.checkForDataReady()) {
     delay(1);
   }
@@ -132,7 +132,7 @@ void Do_Measurement(int _initial=0) {
     SensorFilter.SetCurrent(sensor_raw * SENSOR_CONVERSION);
     }
   distanceSensor.clearInterrupt();
-  distanceSensor.stopRanging();
+  //distanceSensor.stopRanging();
   SensorTime.Filter(millis()-sensor_start);
 
 
@@ -186,6 +186,9 @@ void setup() {
   }
   Serial.println("Sensor online!");
   distanceSensor.setDistanceModeLong();
+  distanceSensor.setTimingBudgetInMs(50);
+  distanceSensor.setIntermeasurementPeriod(50);
+  distanceSensor.startRanging();
 
   // Setup Filter, set initial value
   Do_Measurement(1);
