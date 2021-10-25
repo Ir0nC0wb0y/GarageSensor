@@ -4,10 +4,10 @@ This project sets out to create a useable garage parking distance sensor using i
 
 # SW Development Plan:
 
-So far, the development of this project has been on a pro micro (clone). I intend to make a version that uses a NodeMCU (ESP8266 based dev board) to enable wifi usability. To that end, I expect to utilize the WifiManager library (link here?) once the hardware gets ported over to the ESP8266 chip.
+I started this development using a pro micro clone and an ultrasonic sensor using the Arduino IDE. I've since moved on to better things (PlatformIO) and have selected a Wemos D1 mini I had on hand. These changes will become the new master once I've gotten all the features it needs, but I will leave the archive branch.
 
 # Mechanical Design
 
-While most garages are fully enclosed, mine happens to be missing the 4th side. I will be designing an enclosure that should be relatively waterproof and including those files here (or maybe linked to a thingiverse thing).
+I am waiting on the hardware to stabilize before the enclosure is designed. I want this to be a single part, but I'm still working through the details in my head how that might work.
 
 # More to follow.
