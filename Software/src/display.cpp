@@ -14,20 +14,25 @@ float rng_a[4] = {0.0, 0.0, 0.0, 0.0};
 void Range_coefs(int range, float x0, float xf) {
     int range_index = range - 1;
     float dx = xf - x0;
+    float dx_2 = dx * dx;
+    #define y0       0
+    #define y0_prime 0
+    #define yf       1
+    #define yf_prime 0
     
     // coeff d
-    rng_d[range_index] = 0;
+    rng_d[range_index] = y0;
     
     // coeff c
-    rng_c[range_index] = 0.0;
+    rng_c[range_index] = y0_prime;
 
     // coeff a
-    rng_a[range_index] = (1 / (dx * dx)) * (NUM_LEDS - rng_c[range_index] - (2 / dx) * (NUM_LEDS - rng_c[range_index] * dx - rng_d[range_index]));
+    rng_a[range_index] = (1 / (dx_2)) * (yf_prime - rng_c[range_index] - (2 / dx) * (yf - rng_c[range_index] * dx - rng_d[range_index]));
 
     // coeff b
-    rng_b[range_index] = (NUM_LEDS - rng_c[range_index] * dx - rng_d[range_index] - rng_a[range_index] * (dx * dx)) / (dx * dx);
+    rng_b[range_index] = (yf - rng_c[range_index] * dx - rng_d[range_index] - rng_a[range_index] * (dx_2 * dx)) / (dx * dx);
 
-    Serial.print("Range "); Serial.print(range); Serial.print(" a:"); Serial.print(rng_a[range_index]); Serial.print(" b:"); Serial.print(rng_b[range_index]); Serial.print(" c:"); Serial.print(rng_c[range_index]); Serial.print(" d:"); Serial.println(rng_d[range_index]);
+    Serial.print("Range "); Serial.print(range); Serial.print(" a:"); Serial.print(rng_a[range_index],4); Serial.print(" b:"); Serial.print(rng_b[range_index],4); Serial.print(" c:"); Serial.print(rng_c[range_index],4); Serial.print(" d:"); Serial.println(rng_d[range_index],4);
 }
 
 void Set_Range_coefs() {
@@ -78,6 +83,8 @@ void Do_Display(float sensor_value) {
       break;
     case 1:
       led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_1) / (DIST_MAX - DIST_THRESH_1));
+      //float x_adj = sensor_value - DIST_THRESH_1;
+      //led_good = NUM_LEDS *
       //Serial.print(", led_good: "); Serial.print(led_good);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
