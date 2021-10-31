@@ -5,6 +5,13 @@
 extern int distance_state;
 
 void Set_Distance_State(float dist_compare) {
+  //distance states:
+  // 0:                 distance >= DIST_MAX
+  // 1:      DIST_MAX > distance >= DIST_THRESH_1
+  // 2: DIST_THRESH_1 > distance >= DIST_THRESH_2
+  // 3: DIST_THRESH_2 > distance >= DIST_THRESH_3
+  // 4: DIST_THRESH_3 > distance >= DIST_MIN
+  // 5:      DIST_Min > distance
   if (dist_compare >= DIST_MAX){
     distance_state = 0;
   } else if (DIST_MAX > dist_compare and dist_compare >= DIST_THRESH_1) {
@@ -23,6 +30,7 @@ void Set_Distance_State(float dist_compare) {
 }
 
 void Do_Display(float sensor_value) {
+  Set_Distance_State(sensor_value);
   int led_good = 0;
   //Serial.print("State("); Serial.print(distance_state); Serial.print(")");
   switch (distance_state) {

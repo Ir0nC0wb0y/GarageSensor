@@ -14,7 +14,6 @@ SFEVL53L1X distanceSensor;
 #define SENSOR_SCL D1
 #define SENSOR_SDA D2
 #define SENSOR_CONVERSION 0.0393700787401575 // mm to inch
-//extern int distance_state = 0;
 
 // Setup Filter
 ExponentialFilter<float> SensorFilter(75, 0);
@@ -45,15 +44,6 @@ void Do_Measurement(int _initial=0) {
   distanceSensor.clearInterrupt();
   //distanceSensor.stopRanging();
   SensorTime.Filter(millis()-sensor_start);
-
-
-    //distance states:
-      // 0:                 distance >= DIST_MAX
-      // 1:      DIST_MAX > distance >= DIST_THRESH_1
-      // 2: DIST_THRESH_1 > distance >= DIST_THRESH_2
-      // 3: DIST_THRESH_2 > distance >= DIST_THRESH_3
-      // 4: DIST_THRESH_3 > distance >= DIST_MIN
-      // 5:      DIST_Min > distance
 }
 
 void setup() {
