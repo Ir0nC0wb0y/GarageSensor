@@ -13,7 +13,7 @@ extern CRGB leds[NUM_LEDS];
 // Distance Values
 // (hardcoding is temporary)
 #define DIST_MAX      120 // maximum start of sensor readings
-#define DIST_THRESH_1  60 // beginning of acceptable range
+#define DIST_THRESH_1  45 // beginning of acceptable range
 #define DIST_THRESH_2  40 // preferred parking distance
 #define DIST_THRESH_3  20 // end of acceptable range
 #define DIST_MIN       10 // start of danger

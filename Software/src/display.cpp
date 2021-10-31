@@ -41,9 +41,9 @@ void Set_Range_coefs() {
   // Range 2
   Range_coefs(2,DIST_THRESH_2, DIST_THRESH_1);
   // Range 3
-  Range_coefs(2,DIST_THRESH_3, DIST_THRESH_1);
+  Range_coefs(3,DIST_THRESH_3, DIST_THRESH_2);
   // Range 4
-  Range_coefs(2,DIST_MIN, DIST_THRESH_3);
+  Range_coefs(4,DIST_MIN, DIST_THRESH_3);
 }
 
 void Set_Distance_State(float dist_compare) {
@@ -74,6 +74,7 @@ void Set_Distance_State(float dist_compare) {
 void Do_Display(float sensor_value) {
   Set_Distance_State(sensor_value);
   int led_good = 0;
+  float x_adj = 0.0;
   //Serial.print("State("); Serial.print(distance_state); Serial.print(")");
   switch (distance_state) {
     case 0:
@@ -82,9 +83,9 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 1:
-      led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_1) / (DIST_MAX - DIST_THRESH_1));
-      //float x_adj = sensor_value - DIST_THRESH_1;
-      //led_good = NUM_LEDS *
+      //led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_1) / (DIST_MAX - DIST_THRESH_1));
+      x_adj = sensor_value - DIST_THRESH_1;
+      led_good = NUM_LEDS * (rng_a[0] * pow(x_adj,3) + rng_b[0] * pow(x_adj,2) + rng_c[0] * x_adj + rng_d[0]);
       //Serial.print(", led_good: "); Serial.print(led_good);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -95,7 +96,9 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 2:
-      led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_2) / (DIST_THRESH_1 - DIST_THRESH_2));
+      //led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_2) / (DIST_THRESH_1 - DIST_THRESH_2));
+      x_adj = sensor_value - DIST_THRESH_2;
+      led_good = NUM_LEDS * (rng_a[1] * pow(x_adj,3) + rng_b[1] * pow(x_adj,2) + rng_c[1] * x_adj + rng_d[1]);
       //Serial.print(", led_good: "); Serial.print(led_good);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -106,7 +109,9 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 3:
-      led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_3) / (DIST_THRESH_2 - DIST_THRESH_3));
+      //led_good = NUM_LEDS * ((sensor_value - DIST_THRESH_3) / (DIST_THRESH_2 - DIST_THRESH_3));
+      x_adj = sensor_value - DIST_THRESH_3;
+      led_good = NUM_LEDS * (rng_a[2] * pow(x_adj,3) + rng_b[2] * pow(x_adj,2) + rng_c[2] * x_adj + rng_d[2]);
       //Serial.print(", led_good: "); Serial.print(led_good);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -117,7 +122,9 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 4:
-      led_good = NUM_LEDS * ((sensor_value - DIST_MIN) / (DIST_THRESH_3 - DIST_MIN));
+      //led_good = NUM_LEDS * ((sensor_value - DIST_MIN) / (DIST_THRESH_3 - DIST_MIN));
+      x_adj = sensor_value - DIST_MIN;
+      led_good = NUM_LEDS * (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
       //Serial.print(", led_good: "); Serial.print(led_good);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -138,6 +145,7 @@ void Do_Display(float sensor_value) {
       }
       break;
   }
+  //Serial.print("led_good: "); Serial.print(led_good);
   //Serial.println();
   FastLED.show();
 }
