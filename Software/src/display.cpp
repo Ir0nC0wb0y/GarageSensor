@@ -4,6 +4,43 @@
 
 extern int distance_state;
 
+//boolean coefficient_state = false;
+float rng_d[4] = {0.0, 0.0, 0.0, 0.0};
+float rng_c[4] = {0.0, 0.0, 0.0, 0.0};
+float rng_b[4] = {0.0, 0.0, 0.0, 0.0};
+float rng_a[4] = {0.0, 0.0, 0.0, 0.0};
+
+
+void Range_coefs(int range, float x0, float xf) {
+    int range_index = range - 1;
+    float dx = xf - x0;
+    
+    // coeff d
+    rng_d[range_index] = 0;
+    
+    // coeff c
+    rng_c[range_index] = 0.0;
+
+    // coeff a
+    rng_a[range_index] = (1 / (dx * dx)) * (NUM_LEDS - rng_c[range_index] - (2 / dx) * (NUM_LEDS - rng_c[range_index] * dx - rng_d[range_index]));
+
+    // coeff b
+    rng_b[range_index] = (NUM_LEDS - rng_c[range_index] * dx - rng_d[range_index] - rng_a[range_index] * (dx * dx)) / (dx * dx);
+
+    Serial.print("Range "); Serial.print(range); Serial.print(" a:"); Serial.print(rng_a[range_index]); Serial.print(" b:"); Serial.print(rng_b[range_index]); Serial.print(" c:"); Serial.print(rng_c[range_index]); Serial.print(" d:"); Serial.println(rng_d[range_index]);
+}
+
+void Set_Range_coefs() {
+  // Range 1
+  Range_coefs(1,DIST_THRESH_1, DIST_MAX);
+  // Range 2
+  Range_coefs(2,DIST_THRESH_2, DIST_THRESH_1);
+  // Range 3
+  Range_coefs(2,DIST_THRESH_3, DIST_THRESH_1);
+  // Range 4
+  Range_coefs(2,DIST_MIN, DIST_THRESH_3);
+}
+
 void Set_Distance_State(float dist_compare) {
   //distance states:
   // 0:                 distance >= DIST_MAX

@@ -79,7 +79,8 @@ void setup() {
   Do_Measurement(1);
   loop_next = millis();
 
-  
+  // Set Range Coefficients
+  Set_Range_coefs();
   }
 
 void loop() {

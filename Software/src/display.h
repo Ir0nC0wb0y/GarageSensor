@@ -9,4 +9,6 @@ int distance_state = 0;
     // 4: DIST_THRESH_3 > distance >= DIST_MIN
     // 5:      DIST_Min > distance
 
+void Set_Range_coefs();
+
 void Do_Display(float sensor_value);
