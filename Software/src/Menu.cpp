@@ -48,8 +48,8 @@ void Menu::Advance(bool start_check) {
             case 2:
                 if (abs(_thresh_temp - _thresh_2) > .01) {
                     Serial.print("Difference, "); Serial.print(abs(_thresh_temp - _thresh_2)); Serial.print("Setting new target: "); Serial.println(_thresh_temp);
-                    Serial.println();
                     _thresh_2 = _thresh_temp;
+                    _new_values = true;
                 }
                 _thresh_temp =_thresh_min;
                 _temp_min = 8.0;
@@ -66,6 +66,7 @@ void Menu::Advance(bool start_check) {
                 if (abs(_thresh_min - _thresh_temp) > .01) {
                     Serial.print("Difference, "); Serial.print(abs(_thresh_min - _thresh_temp)); Serial.print("Setting new danger: "); Serial.println(_thresh_temp);
                     _thresh_min = _thresh_temp;
+                    _new_values = true;
                 }
                 _thresh_temp = _thresh_1;
                 _temp_min = _thresh_2 + MIN_WIDTH;
@@ -82,6 +83,7 @@ void Menu::Advance(bool start_check) {
                 if (abs(_thresh_1 - _thresh_temp) > .01) {
                     Serial.print("Difference, "); Serial.print(abs(_thresh_1 - _thresh_temp)); Serial.print("Setting new target max: "); Serial.println(_thresh_temp);
                     _thresh_1 = _thresh_temp;
+                    _new_values = true;
                 }
                 _thresh_temp = _thresh_3;
                 _temp_min = _thresh_min + MIN_WIDTH;
@@ -97,6 +99,7 @@ void Menu::Advance(bool start_check) {
                 if (abs(_thresh_3 - _thresh_temp) > .01) {
                     Serial.print("Difference, "); Serial.print(abs(_thresh_3 - _thresh_temp)); Serial.print("Setting new target min: "); Serial.println(_thresh_temp);
                     _thresh_3 = _thresh_temp;
+                    _new_values = true;
                 }
             default:
                 _menu_item = 0;
@@ -104,8 +107,6 @@ void Menu::Advance(bool start_check) {
                 break;
         }
     }
-    
-    
 }
 
 void Menu::Exit() {
@@ -139,7 +140,7 @@ void Menu::_Run_menu(int encoder_value) {
             // AL_Target
             // set temp value based on encoder position
                 // compare the calculated position to the limits
-            _thresh_temp = _thresh_2 + (float)encoder_value/4;
+            _thresh_temp = _thresh_2 + (float)encoder_value / _ENCODER_MULTIPLIER;
 
             if (_thresh_temp - _temp_min < 0) {
                 _thresh_temp = _temp_min;
@@ -160,7 +161,7 @@ void Menu::_Run_menu(int encoder_value) {
         case 2:
             // Danger
             // set temp value based on encoder position
-            _thresh_temp = _thresh_min + (float)encoder_value/4;
+            _thresh_temp = _thresh_min + (float)encoder_value / _ENCODER_MULTIPLIER;
             if (_thresh_temp - _temp_min < 0) {
                 _thresh_temp = _temp_min;
             } else if (_thresh_temp - _temp_max > 0) {
@@ -178,7 +179,7 @@ void Menu::_Run_menu(int encoder_value) {
         case 3:
             // AL_Max
             // set temp value based on encoder position
-            _thresh_temp = _thresh_1 + (float)encoder_value/4;
+            _thresh_temp = _thresh_1 + (float)encoder_value / _ENCODER_MULTIPLIER;
             if (_thresh_temp - _temp_min < 0) {
                 _thresh_temp = _temp_min;
             } else if (_thresh_temp - _temp_max > 0) {
@@ -195,7 +196,7 @@ void Menu::_Run_menu(int encoder_value) {
         case 4:
             // AL_Min
             // set temp value based on encoder position
-            _thresh_temp = _thresh_3 + (float)encoder_value/4;
+            _thresh_temp = _thresh_3 + (float)encoder_value / _ENCODER_MULTIPLIER;
             if (_thresh_temp - _temp_min < 0) {
                 _thresh_temp = _temp_min;
             } else if (_thresh_temp - _temp_max > 0) {
@@ -233,4 +234,41 @@ void Menu::_Run_menu(int encoder_value) {
 
 int Menu::getMenuItem() {
     return _menu_item;
+}
+
+float Menu::getThresh_Min() {
+    return _thresh_min;
+}
+
+float Menu::getThresh_1() {
+    return _thresh_1;
+}
+
+float Menu::getThresh_2() {
+    return _thresh_2;
+}
+
+float Menu::getThresh_3() {
+    return _thresh_3;
+}
+
+float Menu::getThresh_Max() {
+    return _thresh_max;
+}
+
+bool Menu::newValues() {
+    if (_menu_item == 0 & _new_values) {
+        _new_values = false;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool Menu::activeMenu() {
+    if (_menu_item > 0) {
+        return true;
+    } else {
+        return false;
+    }
 }

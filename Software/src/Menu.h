@@ -31,6 +31,7 @@ class Menu {
         #define MIN_WIDTH      4.0
         float _temp_min    =   0.0;
         float _temp_max    =   0.0;
+        bool _new_values   = false;
 
         unsigned long _blink_next = 0;
         #define _BLINK_TIME 500
@@ -38,6 +39,7 @@ class Menu {
         int led_altarget  = 0;
         int led_almin     = 0;
         int led_danger    = 0;
+        #define _ENCODER_MULTIPLIER 1
         
         void _Run_menu(int encoder_value);
     
@@ -50,6 +52,14 @@ class Menu {
         void Reset();
         
         int getMenuItem();
+        float getThresh_Min();
+        float getThresh_1();
+        float getThresh_2();
+        float getThresh_3();
+        float getThresh_Max();
+
+        bool newValues();
+        bool activeMenu();
 
 };
 

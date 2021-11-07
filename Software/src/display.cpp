@@ -1,5 +1,3 @@
-//#include <FastLED.h>
-
 #include "common.h"
 
 extern int distance_state;
@@ -37,13 +35,13 @@ void Range_coefs(int range, float x0, float xf) {
 
 void Set_Range_coefs() {
   // Range 1
-  Range_coefs(1,DIST_THRESH_1, DIST_MAX);
+  Range_coefs(1,menu.getThresh_1(), menu.getThresh_Max());
   // Range 2
-  Range_coefs(2,DIST_THRESH_2, DIST_THRESH_1);
+  Range_coefs(2,menu.getThresh_2(), menu.getThresh_1());
   // Range 3
-  Range_coefs(3,DIST_THRESH_3, DIST_THRESH_2);
+  Range_coefs(3,menu.getThresh_3(),menu.getThresh_2());
   // Range 4
-  Range_coefs(4,DIST_MIN, DIST_THRESH_3);
+  Range_coefs(4,menu.getThresh_Min(), menu.getThresh_3());
 }
 
 void Set_Distance_State(float dist_compare) {
@@ -54,17 +52,17 @@ void Set_Distance_State(float dist_compare) {
   // 3: DIST_THRESH_2 > distance >= DIST_THRESH_3
   // 4: DIST_THRESH_3 > distance >= DIST_MIN
   // 5:      DIST_Min > distance
-  if (dist_compare >= DIST_MAX){
+  if (dist_compare >= menu.getThresh_Max()){
     distance_state = 0;
-  } else if (DIST_MAX > dist_compare and dist_compare >= DIST_THRESH_1) {
+  } else if (menu.getThresh_Max() > dist_compare and dist_compare >= menu.getThresh_1()) {
     distance_state = 1;
-  } else if (DIST_THRESH_1 > dist_compare and dist_compare >= DIST_THRESH_2) {
+  } else if (menu.getThresh_1() > dist_compare and dist_compare >= menu.getThresh_2()) {
     distance_state = 2;
-  } else if (DIST_THRESH_2 > dist_compare and dist_compare >= DIST_THRESH_3) {
+  } else if (menu.getThresh_2() > dist_compare and dist_compare >= menu.getThresh_3()) {
     distance_state = 3;
-  } else if (DIST_THRESH_3 > dist_compare and dist_compare >= DIST_MIN) {
+  } else if (menu.getThresh_3() > dist_compare and dist_compare >= menu.getThresh_Min()) {
     distance_state = 4;
-  } else if (DIST_MIN > dist_compare) {
+  } else if (menu.getThresh_Min() > dist_compare) {
     distance_state = 5;
   } else {
     distance_state = -1;
@@ -82,7 +80,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 1:
-      x_adj = sensor_value - DIST_THRESH_1;
+      x_adj = sensor_value - menu.getThresh_1();
       led_good = (rng_a[0] * pow(x_adj,3) + rng_b[0] * pow(x_adj,2) + rng_c[0] * x_adj + rng_d[0]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -93,7 +91,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 2:
-      x_adj = sensor_value - DIST_THRESH_2;
+      x_adj = sensor_value - menu.getThresh_2();
       led_good = (rng_a[1] * pow(x_adj,3) + rng_b[1] * pow(x_adj,2) + rng_c[1] * x_adj + rng_d[1]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -104,7 +102,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 3:
-      x_adj = sensor_value - DIST_THRESH_3;
+      x_adj = sensor_value - menu.getThresh_3();
       led_good = (rng_a[2] * pow(x_adj,3) + rng_b[2] * pow(x_adj,2) + rng_c[2] * x_adj + rng_d[2]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -115,7 +113,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 4:
-      x_adj = sensor_value - DIST_MIN;
+      x_adj = sensor_value - menu.getThresh_Min();
       led_good = (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {

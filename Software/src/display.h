@@ -1,4 +1,3 @@
-//#include "common.h"
 
 int distance_state = 0;
     // distance states:

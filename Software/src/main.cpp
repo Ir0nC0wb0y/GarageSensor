@@ -1,23 +1,26 @@
 // External Libraries
 #include <Arduino.h>
 #include <Wire.h>
-#include "SparkFun_VL53L1X.h"
-#include "Filter.h"
-#include "FastLED.h"
+#include <SparkFun_VL53L1X.h>
+#include <Filter.h>
+#include <FastLED.h>
+#include <ESPRotary.h>
+#include <Button2.h>
 
 // Internal Modules
 #include "common.h"
 #include "display.h"
+#include "Menu.h"
 
 // Setup sensor
 SFEVL53L1X distanceSensor;
 #define SENSOR_SCL D1
 #define SENSOR_SDA D2
 #define SENSOR_CONVERSION 0.0393700787401575 // mm to inch
+bool new_measurement = false;
 
 // Setup Filter
 ExponentialFilter<float> SensorFilter(75, 0);
-ExponentialFilter<float> SensorTime(25, 0);
 unsigned long sensor_loop = 0;
 
 // Loop Parameters
@@ -27,23 +30,50 @@ unsigned long loop_next = 0;
 // Display Setup
 CRGB leds[NUM_LEDS];
 
+// Setup Menu
+  // Rotary Encoder
+  #define ROTARY_A D6
+  #define ROTARY_B D7
+  #define ROTARY_STEPS_CLICK 4
+  ESPRotary r;
 
-//void Do_Measurement(int _initial=0);
-void Do_Measurement(int _initial=0) {
-  int sensor_start = millis();
-  //distanceSensor.startRanging(); //Write configuration bytes to initiate measurement
-  while (!distanceSensor.checkForDataReady()) {
-    delay(1);
+  // Button
+  #define ROTARY_BUTTON D3
+  Button2 b;
+
+  // Menu
+  Menu menu;
+
+  // Button Routines
+  void Button_Click(Button2& btn) {
+    menu.Advance();
+    r.resetPosition(0);
   }
-  int sensor_raw = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
-  if (_initial == 0) {
-    SensorFilter.Filter(sensor_raw * SENSOR_CONVERSION);
-  } else {
-    SensorFilter.SetCurrent(sensor_raw * SENSOR_CONVERSION);
+
+  void Button_Double(Button2& btn) {
+    r.resetPosition();
+    menu.begin();
+  }
+
+  void Button_Long(Button2& btn) {
+    menu.Reset();
+  }
+
+
+void Do_Measurement(int _initial=0) {
+  if (distanceSensor.checkForDataReady()) {
+    new_measurement = true;
+    while (!distanceSensor.checkForDataReady()) {
+      delay(1);
     }
-  distanceSensor.clearInterrupt();
-  //distanceSensor.stopRanging();
-  SensorTime.Filter(millis()-sensor_start);
+    int sensor_raw = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
+    if (_initial == 0) {
+      SensorFilter.Filter(sensor_raw * SENSOR_CONVERSION);
+    } else {
+      SensorFilter.SetCurrent(sensor_raw * SENSOR_CONVERSION);
+      }
+    distanceSensor.clearInterrupt();
+  }
 }
 
 void setup() {
@@ -79,22 +109,34 @@ void setup() {
   Do_Measurement(1);
   loop_next = millis();
 
+  // Setup Input (Encoder and Button)
+  r.begin(ROTARY_A,ROTARY_B,ROTARY_STEPS_CLICK);
+  b.begin(ROTARY_BUTTON);
+  b.setClickHandler(Button_Click);
+  b.setDoubleClickHandler(Button_Double);
+  b.setLongClickTime(2000);
+  b.setLongClickHandler(Button_Long);
+
   // Set Range Coefficients
   Set_Range_coefs(); // adding this function now will make it easier to recalc on the fly, when there is some user engagement
   }
 
 void loop() {
+  r.loop();
+  b.loop();
+  menu.loop(r.getPosition());
+  if (menu.newValues()) {
+    Set_Range_coefs();
+  }
   Do_Measurement();
-  Do_Display(SensorFilter.Current());
+  if (new_measurement & !menu.activeMenu()) {
+    Do_Display(SensorFilter.Current());
+    new_measurement = false;
+  }
 
   if (millis() >= loop_next) {
     Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1); //Serial.print("\tDistance, raw: ");  Serial.println(sensor_raw_float, 3);
     loop_next = millis() + LOOP_TIME;
-  }
-
-  if (millis() >= sensor_loop) {
-    Serial.print("Sensor Time: "); Serial.print(SensorTime.Current()); Serial.println(" ms");
-    sensor_loop = millis() + 5000;
   }
 
 }
