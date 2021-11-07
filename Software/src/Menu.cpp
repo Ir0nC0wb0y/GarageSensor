@@ -257,7 +257,7 @@ float Menu::getThresh_Max() {
 }
 
 bool Menu::newValues() {
-    if (_menu_item == 0 & _new_values) {
+    if ( ( _menu_item == 0 ) && ( _new_values) ) {
         _new_values = false;
         return true;
     } else {
