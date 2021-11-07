@@ -80,7 +80,7 @@ void setup() {
   loop_next = millis();
 
   // Set Range Coefficients
-  Set_Range_coefs();
+  Set_Range_coefs(); // adding this function now will make it easier to recalc on the fly, when there is some user engagement
   }
 
 void loop() {
