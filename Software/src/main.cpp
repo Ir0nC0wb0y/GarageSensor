@@ -83,6 +83,9 @@ void setup() {
   Serial.println("Starting sketch");
   Serial.println();
 
+  // Setup Menu (FS)
+  menu.Init();
+
   // Setup Display
   FastLED.addLeds<WS2812B, LED_DATA, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(10);
@@ -96,8 +99,8 @@ void setup() {
   Serial.println("Starting distance sensor:");
   if (distanceSensor.begin() != 0) { //Begin returns 0 on a good init 
     Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
-    while (1)
-      ;
+    //while (1)
+    //  ;
   }
   Serial.println("Sensor online!");
   distanceSensor.setDistanceModeLong();

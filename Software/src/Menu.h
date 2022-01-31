@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <FastLED.h>
+#include <ARduinoJSON.h>
+#include <LittleFS.h>
 
 #define NUM_LEDS 24
 
@@ -13,21 +15,25 @@ extern CRGB leds[NUM_LEDS];
 //  3 - Set Acceptable Length Maximum
 //  4 - Set Acceptable Length Minimum
 
+struct distances {
+    float threshMax; // max dependable range         (black)
+    float thresh1;   // acceptable length maximum    (cyan)
+    float thresh2;   // acceptable length target     (green)
+    float thresh3;   // acceptable length minimum    (yellow)
+    float threshMin; // danger                       (red)
+};
 
 class Menu {
     protected:
         #define _DEFAULT_THRESH_MAX 120.0
-        #define _DEFAULT_THRESH_1    84.0
-        #define _DEFAULT_THRESH_2    60.0
-        #define _DEFAULT_THRESH_3    50.0
-        #define _DEFAULT_THRESH_MIN  40.0
+        #define _DEFAULT_THRESH_1    37.0
+        #define _DEFAULT_THRESH_2    22.0
+        #define _DEFAULT_THRESH_3    17.0
+        #define _DEFAULT_THRESH_MIN  12.0
+        distances _distances;
+        bool _FS_avoid = true;
         int   _menu_item   =     0;
         float _thresh_temp =   0.0;
-        float _thresh_max  = _DEFAULT_THRESH_MAX; // max dependable range         (black)
-        float _thresh_1    = _DEFAULT_THRESH_1;   // acceptable length maximum    (cyan)
-        float _thresh_2    = _DEFAULT_THRESH_2;   // acceptable length target     (green)
-        float _thresh_3    = _DEFAULT_THRESH_3;   // acceptable length minimum    (yellow)
-        float _thresh_min  = _DEFAULT_THRESH_MIN; // danger                       (red)
         #define MIN_WIDTH      4.0
         float _temp_min    =   0.0;
         float _temp_max    =   0.0;
@@ -42,14 +48,17 @@ class Menu {
         #define _ENCODER_MULTIPLIER 1
         
         void _Run_menu(int encoder_value);
-    
+        void _Load_Conf();
+        void _Save_Conf();
+
     public:
         Menu();
+        void Init();
         void begin(bool first_start = false);
         void loop(int enc_value);
         void Advance(bool start_check = false);
         void Exit();
-        void Reset();
+        void Reset(bool force = false);
         
         int getMenuItem();
         float getThresh_Min();
@@ -60,6 +69,8 @@ class Menu {
 
         bool newValues();
         bool activeMenu();
+
+     
 
 };
 

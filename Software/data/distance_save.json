@@ -1,0 +1,7 @@
+{
+    "threshMax":120.0,
+    "thresh1": 35.0,
+    "thresh2":20.0,
+    "thresh3":15.0,
+    "threshMin":10.0
+  }
