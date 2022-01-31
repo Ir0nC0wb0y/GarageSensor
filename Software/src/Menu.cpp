@@ -86,7 +86,7 @@ void Menu::_Load_Conf() {
     Reset(true);
   }
 
-  if ( _distances.threshMax == 0 | _distances.thresh1 == 0 | _distances.thresh2 == 0 | _distances.thresh3 == 0 | _distances.threshMin == 0 ) {
+  if ( _distances.threshMax == 0 || _distances.thresh1 == 0 || _distances.thresh2 == 0 || _distances.thresh3 == 0 || _distances.threshMin == 0 ) {
     Serial.println("Bad Config, resetting to defaults");
     Reset(true);
   }
