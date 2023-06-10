@@ -4,13 +4,13 @@
 #include <SparkFun_VL53L1X.h>
 #include <Filter.h>
 #include <FastLED.h>
-#include <ESPRotary.h>
-#include <Button2.h>
+//#include <ESPRotary.h>
+//#include <Button2.h>
 
 // Internal Modules
 #include "common.h"
 #include "display.h"
-#include "Menu.h"
+//#include "Menu.h"
 
 // Setup sensor
 SFEVL53L1X distanceSensor;
@@ -29,7 +29,7 @@ unsigned long loop_next = 0;
 
 // Display Setup
 CRGB leds[NUM_LEDS];
-
+/*
 // Setup Menu
   // Rotary Encoder
   #define ROTARY_A D6
@@ -58,7 +58,7 @@ CRGB leds[NUM_LEDS];
   void Button_Long(Button2& btn) {
     menu.Reset();
   }
-
+*/
 
 void Do_Measurement(int _initial=0) {
   if (distanceSensor.checkForDataReady()) {
@@ -109,6 +109,7 @@ void setup() {
   Do_Measurement(1);
   loop_next = millis();
 
+  /*
   // Setup Input (Encoder and Button)
   r.begin(ROTARY_A,ROTARY_B,ROTARY_STEPS_CLICK);
   b.begin(ROTARY_BUTTON);
@@ -116,20 +117,24 @@ void setup() {
   b.setDoubleClickHandler(Button_Double);
   b.setLongClickTime(2000);
   b.setLongClickHandler(Button_Long);
+  */
 
   // Set Range Coefficients
   Set_Range_coefs(); // adding this function now will make it easier to recalc on the fly, when there is some user engagement
   }
 
 void loop() {
+  /*
   r.loop();
   b.loop();
   menu.loop(r.getPosition());
   if (menu.newValues()) {
     Set_Range_coefs();
   }
+  */
   Do_Measurement();
-  if (new_measurement & !menu.activeMenu()) {
+  //if (new_measurement & !menu.activeMenu()) {
+  if (new_measurement) {
     Do_Display(SensorFilter.Current());
     new_measurement = false;
   }

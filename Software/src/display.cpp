@@ -33,7 +33,9 @@ void Range_coefs(int range, float x0, float xf) {
     Serial.print("Range "); Serial.print(range); Serial.print(" a:"); Serial.print(rng_a[range_index],8); Serial.print(" b:"); Serial.print(rng_b[range_index],8); Serial.print(" c:"); Serial.print(rng_c[range_index],8); Serial.print(" d:"); Serial.println(rng_d[range_index],8);
 }
 
+
 void Set_Range_coefs() {
+  /*
   // Range 1
   Range_coefs(1,menu.getThresh_1(), menu.getThresh_Max());
   // Range 2
@@ -42,6 +44,16 @@ void Set_Range_coefs() {
   Range_coefs(3,menu.getThresh_3(),menu.getThresh_2());
   // Range 4
   Range_coefs(4,menu.getThresh_Min(), menu.getThresh_3());
+  */
+  
+  // Range 1
+  Range_coefs(1,DIST_THRESH_1, DIST_MAX);
+  // Range 2
+  Range_coefs(2,DIST_THRESH_2, DIST_THRESH_1);
+  // Range 3
+  Range_coefs(3,DIST_THRESH_3,DIST_THRESH_2);
+  // Range 4
+  Range_coefs(4,DIST_MIN, DIST_THRESH_3);
 }
 
 void Set_Distance_State(float dist_compare) {
@@ -52,6 +64,7 @@ void Set_Distance_State(float dist_compare) {
   // 3: DIST_THRESH_2 > distance >= DIST_THRESH_3
   // 4: DIST_THRESH_3 > distance >= DIST_MIN
   // 5:      DIST_Min > distance
+  /*
   if (dist_compare >= menu.getThresh_Max()){
     distance_state = 0;
   } else if (menu.getThresh_Max() > dist_compare and dist_compare >= menu.getThresh_1()) {
@@ -67,8 +80,29 @@ void Set_Distance_State(float dist_compare) {
   } else {
     distance_state = -1;
   }
+  */
+
+  if (dist_compare >= DIST_MAX){
+    distance_state = 0;
+  } else if (DIST_MAX > dist_compare and dist_compare >= DIST_THRESH_1) {
+    distance_state = 1;
+  } else if (DIST_THRESH_1 > dist_compare and dist_compare >= DIST_THRESH_2) {
+    distance_state = 2;
+  } else if (DIST_THRESH_2 > dist_compare and dist_compare >= DIST_THRESH_3) {
+    distance_state = 3;
+  } else if (DIST_THRESH_3 > dist_compare and dist_compare >= DIST_MIN) {
+    distance_state = 4;
+  } else if (DIST_MIN > dist_compare) {
+    distance_state = 5;
+  } else {
+    distance_state = -1;
+  }
+
 }
 
+
+
+/*
 void Do_Display(float sensor_value) {
   Set_Distance_State(sensor_value);
   int led_good = 0;
@@ -114,6 +148,80 @@ void Do_Display(float sensor_value) {
       break;
     case 4:
       x_adj = sensor_value - menu.getThresh_Min();
+      led_good = (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+        if (i < led_good) {
+          leds[i] = CRGB::STATE_COLOR_4;
+        } else {
+          leds[i] = CRGB::STATE_COLOR_5;
+        }
+      }
+      break;
+    case 5:
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+        leds[i] = CRGB::STATE_COLOR_5;
+      }
+      break;
+    default:
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+        leds[i] = CRGB::STATE_COLOR_ERR;
+      }
+      break;
+  }
+  FastLED.show();
+}*/
+
+// Distance Values
+//#define DIST_MAX      120 // maximum start of sensor readings
+//#define DIST_THRESH_1  45 // beginning of acceptable range
+//#define DIST_THRESH_2  40 // preferred parking distance
+//#define DIST_THRESH_3  20 // end of acceptable range
+//#define DIST_MIN       10 // start of danger
+void Do_Display(float sensor_value) {
+  Set_Distance_State(sensor_value);
+  int led_good = 0;
+  float x_adj = 0.0;
+  switch (distance_state) {
+    case 0:
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+          leds[i] = CRGB::STATE_COLOR_1;
+      }
+      break;
+    case 1:
+      x_adj = sensor_value - DIST_THRESH_1;
+      led_good = (rng_a[0] * pow(x_adj,3) + rng_b[0] * pow(x_adj,2) + rng_c[0] * x_adj + rng_d[0]);
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+        if (i < led_good) {
+          leds[i] = CRGB::STATE_COLOR_1;
+        } else {
+          leds[i] = CRGB::STATE_COLOR_2;
+        }
+      }
+      break;
+    case 2:
+      x_adj = sensor_value - DIST_THRESH_2;
+      led_good = (rng_a[1] * pow(x_adj,3) + rng_b[1] * pow(x_adj,2) + rng_c[1] * x_adj + rng_d[1]);
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+        if (i < led_good) {
+          leds[i] = CRGB::STATE_COLOR_2;
+        } else {
+          leds[i] = CRGB::STATE_COLOR_3;
+        }
+      }
+      break;
+    case 3:
+      x_adj = sensor_value - DIST_THRESH_3;
+      led_good = (rng_a[2] * pow(x_adj,3) + rng_b[2] * pow(x_adj,2) + rng_c[2] * x_adj + rng_d[2]);
+      for ( int i = 0; i <= NUM_LEDS-1; i++) {
+        if (i < led_good) {
+          leds[i] = CRGB::STATE_COLOR_3;
+        } else {
+          leds[i] = CRGB::STATE_COLOR_4;
+        }
+      }
+      break;
+    case 4:
+      x_adj = sensor_value - DIST_MIN;
       led_good = (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
