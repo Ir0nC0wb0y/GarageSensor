@@ -17,9 +17,10 @@ extern CRGB leds[NUM_LEDS];
 #define DIST_THRESH_3  20 // end of acceptable range
 #define DIST_MIN       10 // start of danger
 
-#define STATE_COLOR_1 DarkBlue
-#define STATE_COLOR_2 Cyan
-#define STATE_COLOR_3 Green
-#define STATE_COLOR_4 Yellow
-#define STATE_COLOR_5 Red
-#define STATE_COLOR_ERR Purple
+#define STATE_COLOR_1     DarkBlue
+#define STATE_COLOR_2     Cyan
+#define STATE_COLOR_3     Green
+#define STATE_COLOR_4     Yellow
+#define STATE_COLOR_5_ON  Red
+#define STATE_COLOR_5_OFF DarkRed
+#define STATE_COLOR_ERR   Purple

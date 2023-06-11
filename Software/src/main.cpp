@@ -29,6 +29,7 @@ unsigned long loop_next = 0;
 
 // Display Setup
 CRGB leds[NUM_LEDS];
+
 /*
 // Setup Menu
   // Rotary Encoder
@@ -91,7 +92,7 @@ void setup() {
     leds[i] = CRGB::Black;
   }
   FastLED.show();
-  rainbow_show(500,2);
+  rainbow_show(5000,2);
 
   // Setup Sensor
   Wire.begin(SENSOR_SDA,SENSOR_SCL);
@@ -109,8 +110,8 @@ void setup() {
   }
   Serial.println("Sensor online!");
   distanceSensor.setDistanceModeLong();
-  distanceSensor.setTimingBudgetInMs(50);
-  distanceSensor.setIntermeasurementPeriod(50);
+  distanceSensor.setTimingBudgetInMs(25);
+  distanceSensor.setIntermeasurementPeriod(25);
   distanceSensor.startRanging();
 
   // Setup Filter, set initial value

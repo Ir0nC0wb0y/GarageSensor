@@ -1,6 +1,12 @@
 #include "common.h"
 
-extern int distance_state;
+// Setup Variables
+  int distance_state = 0;
+  bool ds5_last               = false;
+  unsigned int ds5_flash_next =     0;
+  #define DS5_FLASH_TIME          250
+
+//extern int distance_state;
 
 //boolean coefficient_state = false;
 float rng_d[4] = {0.0, 0.0, 0.0, 0.0};
@@ -82,6 +88,8 @@ void Set_Distance_State(float dist_compare) {
   }
   */
 
+  int distance_state_last = distance_state;
+
   if (dist_compare >= DIST_MAX){
     distance_state = 0;
   } else if (DIST_MAX > dist_compare and dist_compare >= DIST_THRESH_1) {
@@ -94,6 +102,10 @@ void Set_Distance_State(float dist_compare) {
     distance_state = 4;
   } else if (DIST_MIN > dist_compare) {
     distance_state = 5;
+    if (distance_state != distance_state_last) {
+      ds5_last = true;
+      ds5_flash_next = millis() + DS5_FLASH_TIME;
+    }
   } else {
     distance_state = -1;
   }
@@ -227,13 +239,23 @@ void Do_Display(float sensor_value) {
         if (i < led_good) {
           leds[i] = CRGB::STATE_COLOR_4;
         } else {
-          leds[i] = CRGB::STATE_COLOR_5;
+          leds[i] = CRGB::STATE_COLOR_5_ON;
         }
       }
       break;
     case 5:
-      for ( int i = 0; i <= NUM_LEDS-1; i++) {
-        leds[i] = CRGB::STATE_COLOR_5;
+      if (ds5_last) {
+        for ( int i = 0; i <= NUM_LEDS-1; i++) {
+          leds[i] = CRGB::STATE_COLOR_5_ON;
+        }
+      } else {
+        for ( int i = 0; i <= NUM_LEDS-1; i++) {
+          leds[i] = CRGB::STATE_COLOR_5_OFF;
+        }
+      }
+      if (millis() >= ds5_flash_next) {
+        ds5_last = !ds5_last;
+        ds5_flash_next = millis() + DS5_FLASH_TIME;
       }
       break;
     default:
