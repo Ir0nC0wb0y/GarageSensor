@@ -86,18 +86,26 @@ void setup() {
   // Setup Display
   FastLED.addLeds<WS2812B, LED_DATA, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(10);
+  // Sets all LED's to one color (Black)
   for ( int i = 0; i <= NUM_LEDS-1; i++) {
-    leds[i] = CRGB::Blue;
+    leds[i] = CRGB::Black;
   }
   FastLED.show();
+  rainbow_show(500,2);
 
   // Setup Sensor
   Wire.begin(SENSOR_SDA,SENSOR_SCL);
   Serial.println("Starting distance sensor:");
   if (distanceSensor.begin() != 0) { //Begin returns 0 on a good init 
-    Serial.println("Sensor failed to begin. Please check wiring. Freezing...");
-    while (1)
-      ;
+    Serial.println("Sensor failed to begin. Retrying in 30 seconds");
+    bool sensor_start = false;
+    while (!sensor_start) {
+      rainbow_show(0);
+      Serial.println("Re-attempting sensor");
+      distanceSensor.begin();
+      sensor_start = distanceSensor.checkBootState();
+      Serial.println("Sensor failed to begin. Retrying in 30 seconds");
+    }
   }
   Serial.println("Sensor online!");
   distanceSensor.setDistanceModeLong();

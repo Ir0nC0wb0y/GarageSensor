@@ -244,3 +244,22 @@ void Do_Display(float sensor_value) {
   }
   FastLED.show();
 }
+
+void rainbow_show(unsigned int rainbow_duration, int thisSpeed, int deltaHue) {
+  if (rainbow_duration < 10) {
+    rainbow_duration = 30000;
+  }
+  
+  unsigned int rainbow_time = millis();
+  Serial.print("Starting Rainbow for ");
+    Serial.print(rainbow_duration/1000);
+    Serial.println(" seconds");
+  while (millis() - rainbow_time < rainbow_duration) {
+    // uint8_t thisHue = beatsin8(thisSpeed,0,255);                // A simple rainbow wave.
+    uint8_t thisHue = beat8(thisSpeed,255);                     // A simple rainbow march.
+      
+    fill_rainbow(leds, NUM_LEDS, thisHue, deltaHue);            // Use FastLED's fill_rainbow routine.
+    FastLED.show();
+    yield();
+  }
+}
