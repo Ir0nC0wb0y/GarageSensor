@@ -92,7 +92,7 @@ void setup() {
     leds[i] = CRGB::Black;
   }
   FastLED.show();
-  rainbow_show(5000,2);
+  rainbow_show(5000,75);
 
   // Setup Sensor
   Wire.begin(SENSOR_SDA,SENSOR_SCL);
@@ -110,8 +110,8 @@ void setup() {
   }
   Serial.println("Sensor online!");
   distanceSensor.setDistanceModeLong();
-  distanceSensor.setTimingBudgetInMs(25);
-  distanceSensor.setIntermeasurementPeriod(25);
+  distanceSensor.setTimingBudgetInMs(50);
+  distanceSensor.setIntermeasurementPeriod(50);
   distanceSensor.startRanging();
 
   // Setup Filter, set initial value

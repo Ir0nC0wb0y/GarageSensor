@@ -22,5 +22,5 @@ extern CRGB leds[NUM_LEDS];
 #define STATE_COLOR_3     Green
 #define STATE_COLOR_4     Yellow
 #define STATE_COLOR_5_ON  Red
-#define STATE_COLOR_5_OFF DarkRed
+#define STATE_COLOR_5_OFF DarkRed //DarkRed, maybe DarkOrchid, Crimson, MidnightBlue, Navy
 #define STATE_COLOR_ERR   Purple
