@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include <Filter.h>
+//#include <Filter.h>
 //#include <FastLED.h>
 //#include <ESPRotary.h>
 //#include <Button2.h>
@@ -17,6 +17,9 @@
 // Setup I2C Bus (Wire)
 #define SENSOR_SCL D1
 #define SENSOR_SDA D2
+
+// Initialize Settings
+Settings settings;
 
 // Initialize Sensor
 DistSensor distSensor;
@@ -51,6 +54,9 @@ void setup() {
     Serial.println("LittleFS Set Up");
   }
 
+  // Initialize Settings
+  settings.init();
+
   // Initialize WiFi
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -83,9 +89,6 @@ void setup() {
   distSensor.Do_Measurement(1);
   loop_next = millis();
 
-  // Initialize Settings
-  settings.init();
-
   // Set Range Coefficients
   Set_Range_coefs(); // adding this function now will make it easier to recalc on the fly, when there is some user engagement
   }
@@ -101,7 +104,7 @@ void loop() {
   */
   distSensor.Do_Measurement();
 
-  
+  webserver_loop();
 
   if (millis() >= loop_next) {
     Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1);

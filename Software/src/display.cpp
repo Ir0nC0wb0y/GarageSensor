@@ -1,4 +1,5 @@
 #include "common.h"
+#include "display.h"
 
 // Setup Variables
   int distance_state = 0;
@@ -14,12 +15,6 @@ float rng_c[4] = {0.0, 0.0, 0.0, 0.0};
 float rng_b[4] = {0.0, 0.0, 0.0, 0.0};
 float rng_a[4] = {0.0, 0.0, 0.0, 0.0};
 
-// Default values
-//STOP_LIMIT -> DIST_MIN      -> STATE5
-//OK_END     -> DIST_THRESH_3 -> STATE4
-//GOOD_END   -> DIST_THRESH_2 -> STATE3
-//GOOD_START -> DIST_THRESH_1 -> STATE2
-//FAR_START  -> DIST_MAX      -> STATE1
 
 void Range_coefs(int range, float x0, float xf) {
     int range_index = range - 1;
@@ -58,13 +53,15 @@ void Set_Range_coefs() {
   */
   
   // Range 1
-  Range_coefs(1,DIST_THRESH_1, DIST_MAX);
+  Range_coefs(1,settings.GoodStart, settings.FarStart);
   // Range 2
-  Range_coefs(2,DIST_THRESH_2, DIST_THRESH_1);
+  Range_coefs(2,settings.GoodEnd, settings.GoodStart);
   // Range 3
-  Range_coefs(3,DIST_THRESH_3,DIST_THRESH_2);
+  Range_coefs(3,settings.OkEnd,settings.GoodEnd);
   // Range 4
-  Range_coefs(4,DIST_MIN, DIST_THRESH_3);
+  Range_coefs(4,settings.StopLimit, settings.OkEnd);
+
+  Serial.println("Updated range coefficients");
 }
 
 void Set_Distance_State(float dist_compare) {
@@ -95,17 +92,17 @@ void Set_Distance_State(float dist_compare) {
 
   int distance_state_last = distance_state;
 
-  if (dist_compare >= DIST_MAX){
+  if (dist_compare >= settings.FarStart){
     distance_state = 0;
-  } else if (DIST_MAX > dist_compare and dist_compare >= DIST_THRESH_1) {
+  } else if (settings.FarStart > dist_compare and dist_compare >= settings.GoodStart) {
     distance_state = 1;
-  } else if (DIST_THRESH_1 > dist_compare and dist_compare >= DIST_THRESH_2) {
+  } else if (settings.GoodStart > dist_compare and dist_compare >= settings.GoodEnd) {
     distance_state = 2;
-  } else if (DIST_THRESH_2 > dist_compare and dist_compare >= DIST_THRESH_3) {
+  } else if (settings.GoodEnd > dist_compare and dist_compare >= settings.OkEnd) {
     distance_state = 3;
-  } else if (DIST_THRESH_3 > dist_compare and dist_compare >= DIST_MIN) {
+  } else if (settings.OkEnd > dist_compare and dist_compare >= settings.StopLimit) {
     distance_state = 4;
-  } else if (DIST_MIN > dist_compare) {
+  } else if (settings.StopLimit > dist_compare) {
     distance_state = 5;
     if (distance_state != distance_state_last) {
       ds5_last = true;
@@ -116,6 +113,14 @@ void Set_Distance_State(float dist_compare) {
   }
 
 }
+
+
+// Setting value Name Translation
+//STOP_LIMIT -> DIST_MIN      -> STATE5
+//OK_END     -> DIST_THRESH_3 -> STATE4
+//GOOD_END   -> DIST_THRESH_2 -> STATE3
+//GOOD_START -> DIST_THRESH_1 -> STATE2
+//FAR_START  -> DIST_MAX      -> STATE1
 
 void Do_Display(float sensor_value) {
   Set_Distance_State(sensor_value);
@@ -128,7 +133,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 1:
-      x_adj = sensor_value - DIST_THRESH_1;
+      x_adj = sensor_value - settings.GoodStart;
       led_good = (rng_a[0] * pow(x_adj,3) + rng_b[0] * pow(x_adj,2) + rng_c[0] * x_adj + rng_d[0]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -139,7 +144,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 2:
-      x_adj = sensor_value - DIST_THRESH_2;
+      x_adj = sensor_value - settings.GoodEnd;
       led_good = (rng_a[1] * pow(x_adj,3) + rng_b[1] * pow(x_adj,2) + rng_c[1] * x_adj + rng_d[1]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -150,7 +155,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 3:
-      x_adj = sensor_value - DIST_THRESH_3;
+      x_adj = sensor_value - settings.OkEnd;
       led_good = (rng_a[2] * pow(x_adj,3) + rng_b[2] * pow(x_adj,2) + rng_c[2] * x_adj + rng_d[2]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {
@@ -161,7 +166,7 @@ void Do_Display(float sensor_value) {
       }
       break;
     case 4:
-      x_adj = sensor_value - DIST_MIN;
+      x_adj = sensor_value - settings.StopLimit;
       led_good = (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         if (i < led_good) {

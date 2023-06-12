@@ -1,26 +1,31 @@
 #include <FastLED.h>
 #include <colorutils.h>
-//#include "Menu.h"
+#include <Filter.h>
+#include "Settings.h"
 
 // Display Data
 #define NUM_LEDS 24
 #define LED_DATA D5
 extern CRGB leds[NUM_LEDS];
+extern ExponentialFilter<float> SensorFilter;
 
-// Default values
+// Setting value Name Translation
 //STOP_LIMIT -> DIST_MIN      -> STATE5
 //OK_END     -> DIST_THRESH_3 -> STATE4
 //GOOD_END   -> DIST_THRESH_2 -> STATE3
 //GOOD_START -> DIST_THRESH_1 -> STATE2
 //FAR_START  -> DIST_MAX      -> STATE1
 
+
 // Distance Values
+/*
 #define DIST_MAX      120 // maximum start of sensor readings
 #define DIST_THRESH_1  45 // beginning of acceptable range
 #define DIST_THRESH_2  40 // preferred parking distance
 #define DIST_THRESH_3  20 // end of acceptable range
 #define DIST_MIN       10 // start of danger
-//extern Settings settings; // This is the new website configuration method
+*/
+extern Settings settings; // This is the new website configuration method
 
 #define STATE_COLOR_1     DarkBlue
 #define STATE_COLOR_2     Cyan

@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <LittleFS.h>
+#include "display.h"
 
 // Default values
 #define DEF_STOP_LIMIT   10.0

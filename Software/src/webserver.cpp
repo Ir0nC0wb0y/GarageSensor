@@ -2,7 +2,7 @@
 #include "webserver.h"
 
 // Create variables
-int sensor_val_last = sensor_val;
+int sensor_val_last = SensorFilter.Current();
 unsigned long webpage_update_sensor = 0;
 int webpage_update_sensor_skip      = 0;
 unsigned long webpage_update_ping   = 0;
@@ -39,7 +39,7 @@ String processor(const String& var){
   } else if(var == "FarStart"){
     return String(settings.FarStart);
   } else if(var == "SensorValue"){
-    return String(sensor_val);
+    return String(SensorFilter.Current());
   }
   return String();
 }
@@ -144,12 +144,14 @@ void webserver_loop() {
       webpage_update_ping = millis() + WEBPAGE_UPDATE_PING;
       events.send("ping",NULL,millis());
       Serial.println();
-      Serial.print("Current Sensor Value: "); Serial.println(sensor_val);
+      Serial.print("Current Sensor Value: "); Serial.println(SensorFilter.Current());
     }
 
     // Sensor
     if (millis() >= webpage_update_sensor) {
+      float sensor_val = SensorFilter.Current();
       if (abs(sensor_val - sensor_val_last) >= SENSOR_MIN_CHANGE) {
+        float sensor_val = SensorFilter.Current();
         events.send(String(sensor_val).c_str(),"SensorValue",millis());
         Serial.print(".");
         sensor_val_last = sensor_val;

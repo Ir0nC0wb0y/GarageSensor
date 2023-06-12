@@ -129,18 +129,9 @@ bool Settings::SetSetting(const char * setting, float setting_value) {
       Serial.print("      ");
   }
 
-  /*
   if (setting_update) {
-    Serial.print("Updated ");
-      Serial.print(setting);
-      Serial.print(" to ");
-      Serial.println(setting_value);
-  } else {
-    Serial.print("Parameter ");
-      Serial.print(setting);
-      Serial.println("Not updated");
+    Set_Range_coefs();
   }
-  */
   return setting_update;
 }
 
@@ -161,4 +152,7 @@ void Settings::ResetAll() {
 
   //FAR_START
   FarStart  = _InitSetting(DIR_FAR_START,DEF_FAR_START,true);
+  
+  // Update Display parameters
+  Set_Range_coefs();
 }

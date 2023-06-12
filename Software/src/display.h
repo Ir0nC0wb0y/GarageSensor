@@ -1,4 +1,5 @@
-
+#include <Arduino.h>
+#include "Settings.h"
 //int distance_state = 0;
     // distance states:
     // 0:                 distance >= DIST_MAX
