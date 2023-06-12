@@ -14,6 +14,12 @@ float rng_c[4] = {0.0, 0.0, 0.0, 0.0};
 float rng_b[4] = {0.0, 0.0, 0.0, 0.0};
 float rng_a[4] = {0.0, 0.0, 0.0, 0.0};
 
+// Default values
+//STOP_LIMIT -> DIST_MIN      -> STATE5
+//OK_END     -> DIST_THRESH_3 -> STATE4
+//GOOD_END   -> DIST_THRESH_2 -> STATE3
+//GOOD_START -> DIST_THRESH_1 -> STATE2
+//FAR_START  -> DIST_MAX      -> STATE1
 
 void Range_coefs(int range, float x0, float xf) {
     int range_index = range - 1;

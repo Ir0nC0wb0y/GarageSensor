@@ -7,6 +7,13 @@
 #define LED_DATA D5
 extern CRGB leds[NUM_LEDS];
 
+// Default values
+//STOP_LIMIT -> DIST_MIN      -> STATE5
+//OK_END     -> DIST_THRESH_3 -> STATE4
+//GOOD_END   -> DIST_THRESH_2 -> STATE3
+//GOOD_START -> DIST_THRESH_1 -> STATE2
+//FAR_START  -> DIST_MAX      -> STATE1
+
 // Distance Values
 #define DIST_MAX      120 // maximum start of sensor readings
 #define DIST_THRESH_1  45 // beginning of acceptable range

@@ -11,7 +11,7 @@
 #include "common.h"
 #include "display.h"
 #include "DistanceSensor.h"
-//#include "Menu.h"
+#include "Settings.h"
 
 // Setup I2C Bus (Wire)
 #define SENSOR_SCL D1
@@ -29,8 +29,6 @@ unsigned long loop_next = 0;
 
 // Display Setup
 CRGB leds[NUM_LEDS];
-
-
 
 void setup() {
   // Setup Serial
@@ -57,16 +55,6 @@ void setup() {
   distSensor.Do_Measurement(1);
   loop_next = millis();
 
-  /*
-  // Setup Input (Encoder and Button)
-  r.begin(ROTARY_A,ROTARY_B,ROTARY_STEPS_CLICK);
-  b.begin(ROTARY_BUTTON);
-  b.setClickHandler(Button_Click);
-  b.setDoubleClickHandler(Button_Double);
-  b.setLongClickTime(2000);
-  b.setLongClickHandler(Button_Long);
-  */
-
   // Set Range Coefficients
   Set_Range_coefs(); // adding this function now will make it easier to recalc on the fly, when there is some user engagement
   }
@@ -81,11 +69,11 @@ void loop() {
   }
   */
   distSensor.Do_Measurement();
-  //if (new_measurement & !menu.activeMenu()) {
+
   
 
   if (millis() >= loop_next) {
-    Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1); //Serial.print("\tDistance, raw: ");  Serial.println(sensor_raw_float, 3);
+    Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1);
     loop_next = millis() + LOOP_TIME;
   }
 
