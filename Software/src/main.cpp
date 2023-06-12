@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <SparkFun_VL53L1X.h>
 #include <Filter.h>
-#include <FastLED.h>
+//#include <FastLED.h>
 //#include <ESPRotary.h>
 //#include <Button2.h>
 
