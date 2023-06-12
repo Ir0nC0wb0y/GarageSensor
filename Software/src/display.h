@@ -17,4 +17,4 @@ void Set_Range_coefs();
 
 void Do_Display(float sensor_value);
 
-void rainbow_show(unsigned int rainbow_duration, int thisSpeed = 10, int deltaHue = 10);
+void rainbow_show(unsigned int rainbow_duration, int thisSpeed, int deltaHue);
