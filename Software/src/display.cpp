@@ -41,17 +41,6 @@ void Range_coefs(int range, float x0, float xf) {
 }
 
 void Set_Range_coefs() {
-  /*
-  // Range 1
-  Range_coefs(1,menu.getThresh_1(), menu.getThresh_Max());
-  // Range 2
-  Range_coefs(2,menu.getThresh_2(), menu.getThresh_1());
-  // Range 3
-  Range_coefs(3,menu.getThresh_3(),menu.getThresh_2());
-  // Range 4
-  Range_coefs(4,menu.getThresh_Min(), menu.getThresh_3());
-  */
-  
   // Range 1
   Range_coefs(1,settings.GoodStart, settings.FarStart);
   // Range 2
@@ -72,23 +61,6 @@ void Set_Distance_State(float dist_compare) {
   // 3: DIST_THRESH_2 > distance >= DIST_THRESH_3
   // 4: DIST_THRESH_3 > distance >= DIST_MIN
   // 5:      DIST_Min > distance
-  /*
-  if (dist_compare >= menu.getThresh_Max()){
-    distance_state = 0;
-  } else if (menu.getThresh_Max() > dist_compare and dist_compare >= menu.getThresh_1()) {
-    distance_state = 1;
-  } else if (menu.getThresh_1() > dist_compare and dist_compare >= menu.getThresh_2()) {
-    distance_state = 2;
-  } else if (menu.getThresh_2() > dist_compare and dist_compare >= menu.getThresh_3()) {
-    distance_state = 3;
-  } else if (menu.getThresh_3() > dist_compare and dist_compare >= menu.getThresh_Min()) {
-    distance_state = 4;
-  } else if (menu.getThresh_Min() > dist_compare) {
-    distance_state = 5;
-  } else {
-    distance_state = -1;
-  }
-  */
 
   int distance_state_last = distance_state;
 
@@ -113,14 +85,6 @@ void Set_Distance_State(float dist_compare) {
   }
 
 }
-
-
-// Setting value Name Translation
-//STOP_LIMIT -> DIST_MIN      -> STATE5
-//OK_END     -> DIST_THRESH_3 -> STATE4
-//GOOD_END   -> DIST_THRESH_2 -> STATE3
-//GOOD_START -> DIST_THRESH_1 -> STATE2
-//FAR_START  -> DIST_MAX      -> STATE1
 
 void Do_Display(float sensor_value) {
   Set_Distance_State(sensor_value);

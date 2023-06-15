@@ -76,14 +76,6 @@ float Settings::_InitSetting(const char * settingDir, float settingDefault, bool
   return setting_out;
 }
 
-/*
-float Settings::GetSetting(const char * setting) {
-  // return the setting from class
-  // Load Settings from saved file(s)
-  return 3.14;
-}
-*/
-
 bool Settings::SetSetting(const char * setting, float setting_value) {
   // Check if setting_value has changed
     // if change
