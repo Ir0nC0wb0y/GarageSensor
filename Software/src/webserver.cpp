@@ -143,8 +143,6 @@ void webserver_loop() {
     if (millis() >= webpage_update_ping) {
       webpage_update_ping = millis() + WEBPAGE_UPDATE_PING;
       events.send("ping",NULL,millis());
-      Serial.println();
-      Serial.print("Current Sensor Value: "); Serial.println(SensorFilter.Current());
     }
 
     // Sensor
@@ -153,7 +151,7 @@ void webserver_loop() {
       if (abs(sensor_val - sensor_val_last) >= SENSOR_MIN_CHANGE) {
         float sensor_val = SensorFilter.Current();
         events.send(String(sensor_val).c_str(),"SensorValue",millis());
-        Serial.print(".");
+        //Serial.print(".");
         sensor_val_last = sensor_val;
         webpage_update_sensor_skip = 0;
         //Serial.println("Webpage Sensor updated");
@@ -161,13 +159,13 @@ void webserver_loop() {
         // skip sending update if value not changed
         if (webpage_update_sensor_skip >= WEBPAGE_SENSOR_SKIP_THRESH) {
           events.send(String(sensor_val).c_str(),"SensorValue",millis());
-          Serial.print(".");
+          //Serial.print(".");
           sensor_val_last = sensor_val;
           webpage_update_sensor_skip = 0;
           //Serial.println("Webpage Sensor update forced");
         } else {
           webpage_update_sensor_skip++;
-          Serial.print("-");
+          //Serial.print("-");
           //Serial.print("Webpage Sensor update skipped, "); Serial.println(webpage_update_sensor_skip);
         }
       }

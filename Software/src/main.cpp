@@ -12,7 +12,10 @@
 #include "display.h"
 #include "DistanceSensor.h"
 #include "Settings.h"
+
+// Initialize WiFi
 #include "WiFi_Cred.h"
+bool wifi_connected = false;
 
 // Setup I2C Bus (Wire)
 #define SENSOR_SCL D1
@@ -28,7 +31,7 @@ DistSensor distSensor;
 ExponentialFilter<float> SensorFilter(75, 0);
 
 // Loop Parameters
-#define LOOP_TIME 500 // 2 measurements printed per second
+#define LOOP_TIME 1000 // 2 measurements printed per second
 unsigned long loop_next = 0;
 
 // Display Setup
@@ -44,7 +47,7 @@ void setup() {
   Serial.println("Starting sketch");
   Serial.println();
 
-  // Initialize LittleFS
+  // Setup LittleFS
   Serial.println();
   Serial.print("Setting up LittleFS: ");
   if(!LittleFS.begin()){
@@ -54,24 +57,12 @@ void setup() {
     Serial.println("LittleFS Set Up");
   }
 
-  // Initialize Settings
+  // Setup Settings
+  Serial.println("Setting up Settings");
   settings.init();
 
-  // Initialize WiFi
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WiFi Failed!");
-    return;
-  }
-  Serial.println();
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-
-  // Initialize Webserver
-  webserver_setup();
-
   // Setup Display
+  Serial.println("Setting  up display");
   FastLED.addLeds<WS2812B, LED_DATA, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(10);
   // Sets all LED's to one color (Black)
@@ -81,7 +72,31 @@ void setup() {
   FastLED.show();
   rainbow_show(5000,75,10);
 
+  // Initialize WiFi
+  Serial.println("Attempting to connect WiFi");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println();
+    Serial.println("WiFi Failed!");
+    //return;
+  } else {
+    wifi_connected = true;
+    Serial.println();
+    Serial.print("IP Address: ");
+      Serial.println(WiFi.localIP());
+  }
+
+  // Setup Webserver
+  if (wifi_connected) {
+    Serial.println("Setting up webserver");
+    webserver_setup();
+  } else {
+    Serial.println("Skipping webserver, WiFi not connected");
+  }
+
   // Setup Sensor
+  Serial.println("Setting up sensor");
   Wire.begin(SENSOR_SDA,SENSOR_SCL);
   distSensor.SensorSetup();
   
@@ -90,7 +105,7 @@ void setup() {
   loop_next = millis();
 
   // Set Range Coefficients
-  Set_Range_coefs(); // adding this function now will make it easier to recalc on the fly, when there is some user engagement
+  Set_Range_coefs();
   }
 
 void loop() {
@@ -104,7 +119,9 @@ void loop() {
   */
   distSensor.Do_Measurement();
 
-  webserver_loop();
+  if (wifi_connected) {
+    webserver_loop();
+  }
 
   if (millis() >= loop_next) {
     Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1);
