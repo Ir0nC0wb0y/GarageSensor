@@ -7,6 +7,8 @@
   unsigned int ds5_flash_next =     0;
   #define DS5_FLASH_TIME          250
 
+// Display 
+
 //extern int distance_state;
 
 //boolean coefficient_state = false;
@@ -181,4 +183,10 @@ void rainbow_show(unsigned int rainbow_duration, int thisSpeed, int deltaHue) {
     FastLED.show();
     yield();
   }
+}
+
+void rainbow_frame(int thisSpeed) {
+  uint8_t thisHue = beat8(thisSpeed,255);                     // A simple rainbow march.
+  fill_rainbow(leds, NUM_LEDS, thisHue, 10);            // Use FastLED's fill_rainbow routine.
+  FastLED.show();
 }

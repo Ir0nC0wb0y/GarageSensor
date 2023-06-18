@@ -8,14 +8,11 @@
 //#include <Button2.h>
 
 // Internal Modules
-#include "common.h"
-#include "display.h"
-#include "DistanceSensor.h"
-#include "Settings.h"
-
-// Initialize WiFi
-#include "WiFi_Cred.h"
-bool wifi_connected = false;
+  #include "common.h"
+  #include "display.h"
+  #include "DistanceSensor.h"
+  #include "Settings.h"
+  #include "WiFi_Setup.h"
 
 // Setup I2C Bus (Wire)
 #define SENSOR_SCL D1
@@ -31,8 +28,10 @@ DistSensor distSensor;
 ExponentialFilter<float> SensorFilter(75, 0);
 
 // Loop Parameters
-#define LOOP_TIME 1000 // 2 measurements printed per second
-unsigned long loop_next = 0;
+#define OUTPUT_TIME 1000 // 2 measurements printed per second
+unsigned long loop_output = 0;
+#define WIFI_CHECK_TIME       300000
+unsigned long loop_wifi = 0;
 
 // Display Setup
 CRGB leds[NUM_LEDS];
@@ -56,10 +55,12 @@ void setup() {
   } else {
     Serial.println("LittleFS Set Up");
   }
+  Serial.println();
 
   // Setup Settings
   Serial.println("Setting up Settings");
   settings.init();
+  Serial.println();
 
   // Setup Display
   Serial.println("Setting  up display");
@@ -70,62 +71,51 @@ void setup() {
     leds[i] = CRGB::Black;
   }
   FastLED.show();
-  rainbow_show(5000,75,10);
+  //rainbow_show(500,75,10);
+  Serial.println();
 
   // Initialize WiFi
-  Serial.println("Attempting to connect WiFi");
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println();
-    Serial.println("WiFi Failed!");
-    //return;
-  } else {
-    wifi_connected = true;
-    Serial.println();
-    Serial.print("IP Address: ");
-      Serial.println(WiFi.localIP());
-  }
+  WiFi_Setup();
+  Serial.println();
 
   // Setup Webserver
   if (wifi_connected) {
-    Serial.println("Setting up webserver");
     webserver_setup();
   } else {
     Serial.println("Skipping webserver, WiFi not connected");
   }
+  Serial.println();
 
   // Setup Sensor
   Serial.println("Setting up sensor");
   Wire.begin(SENSOR_SDA,SENSOR_SCL);
   distSensor.SensorSetup();
-  
-  // Setup Filter, set initial value
-  distSensor.Do_Measurement(1);
-  loop_next = millis();
 
   // Set Range Coefficients
   Set_Range_coefs();
+  Serial.println();
+  
+  // Setup Filter, set initial value
+  distSensor.Do_Measurement(1);
+  loop_output = millis();
+  loop_wifi = millis() + WIFI_CHECK_TIME;
   }
 
 void loop() {
-  /*
-  r.loop();
-  b.loop();
-  menu.loop(r.getPosition());
-  if (menu.newValues()) {
-    Set_Range_coefs();
-  }
-  */
   distSensor.Do_Measurement();
+
+  if (millis() >= loop_wifi) {
+    WiFi_Check();
+    loop_wifi = millis() + WIFI_CHECK_TIME;
+  }
 
   if (wifi_connected) {
     webserver_loop();
   }
 
-  if (millis() >= loop_next) {
+  if (millis() >= loop_output) {
     Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1);
-    loop_next = millis() + LOOP_TIME;
+    loop_output = millis() + OUTPUT_TIME;
   }
 
 }

@@ -1,5 +1,5 @@
 #include <Arduino.h>
 
 // REPLACE WITH YOUR NETWORK CREDENTIALS
-  const char* ssid = "SSID";
-  const char* password = "PASSWORD";
+  const char* ssid = "Oliver13";
+  const char* password = "OrangePeanut23";
