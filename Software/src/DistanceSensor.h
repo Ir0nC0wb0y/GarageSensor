@@ -12,7 +12,7 @@ extern ExponentialFilter<float> SensorFilter;
 class DistSensor {
   public:
     DistSensor();
-    void Do_Measurement(int _initial=0);
+    void Do_Measurement(bool _initial = false);
     void SensorSetup();
     bool new_measurement = false;
   private:

@@ -25,14 +25,17 @@ void DistSensor::SensorSetup() {
   distanceSensor.startRanging();
 }
 
-void DistSensor::Do_Measurement(int _initial) {
+void DistSensor::Do_Measurement(bool _initial) {
+  if (_initial) {
+    while (!distanceSensor.checkForDataReady()) {
+        delay(1);
+        yield();
+    }
+  }
   if (distanceSensor.checkForDataReady()) {
     new_measurement = true;
-    while (!distanceSensor.checkForDataReady()) {
-      delay(1);
-    }
     int sensor_raw = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
-    if (_initial == 0) {
+    if (!_initial) {
       SensorFilter.Filter(sensor_raw * SENSOR_CONVERSION);
     } else {
       SensorFilter.SetCurrent(sensor_raw * SENSOR_CONVERSION);

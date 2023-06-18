@@ -88,7 +88,7 @@ void setup() {
   Serial.println();
   
   // Setup Filter, set initial value
-  distSensor.Do_Measurement(1);
+  distSensor.Do_Measurement(true);
   loop_output = millis();
   loop_wifi = millis() + WIFI_CHECK_TIME;
   }
