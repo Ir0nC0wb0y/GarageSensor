@@ -63,15 +63,7 @@ void setup() {
   Serial.println();
 
   // Setup Display
-  Serial.println("Setting  up display");
-  FastLED.addLeds<WS2812B, LED_DATA, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(10);
-  // Sets all LED's to one color (Black)
-  for ( int i = 0; i <= NUM_LEDS-1; i++) {
-    leds[i] = CRGB::Black;
-  }
-  FastLED.show();
-  //rainbow_show(500,75,10);
+  Display_Setup();
   Serial.println();
 
   // Initialize WiFi

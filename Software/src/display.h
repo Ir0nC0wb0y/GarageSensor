@@ -14,6 +14,8 @@
   //unsigned int ds5_flash_next =     0;
   //#define DS5_FLASH_TIME          250
 
+void Display_Setup();
+
 void Set_Range_coefs();
 
 void Do_Display(float sensor_value);
