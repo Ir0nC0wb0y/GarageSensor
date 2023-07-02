@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "Settings.h"
+//#include "common.h"
 //int distance_state = 0;
     // distance states:
     // 0:                 distance >= DIST_MAX
@@ -18,7 +19,8 @@ void Display_Setup();
 
 void Set_Range_coefs();
 
-void Do_Display(float sensor_value);
+void Maintain_Display();
+void Do_Display();
 
 void rainbow_show(unsigned int rainbow_duration, int thisSpeed, int deltaHue);
 void rainbow_frame(int thisSpeed);

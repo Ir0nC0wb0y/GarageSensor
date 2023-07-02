@@ -45,7 +45,16 @@ String processor(const String& var){
 }
 
 void webserver_setup() {
-  Serial.print("Setting up WebServer");
+  Serial.print("Setting up WebServer: ");
+
+  // First Setup OTA Updates
+  Serial.print("OTA, ");
+  AsyncElegantOTA.begin(&server);
+  AsyncElegantOTA.setID("Garage Sensor");
+
+  // Settings webpage
+  Serial.print("Settings");
+
   // Send web page with input fields to client
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);

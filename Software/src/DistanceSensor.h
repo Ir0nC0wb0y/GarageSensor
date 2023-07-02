@@ -8,6 +8,8 @@
 extern ExponentialFilter<float> SensorFilter;
 
 #define SENSOR_CONVERSION 0.0393700787401575 // mm to inch
+#define SENSOR_TIMING_BUDGET 50
+#define SENSOR_INTER_PERIOD  50
 
 class DistSensor {
   public:

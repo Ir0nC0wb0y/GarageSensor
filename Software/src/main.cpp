@@ -2,10 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-//#include <Filter.h>
-//#include <FastLED.h>
-//#include <ESPRotary.h>
-//#include <Button2.h>
+#define SKETCH_VERSION "0.2.1"
 
 // Internal Modules
   #include "common.h"
@@ -25,13 +22,13 @@ Settings settings;
 DistSensor distSensor;
 
 // Initialize Filter
-ExponentialFilter<float> SensorFilter(75, 0);
+ExponentialFilter<float> SensorFilter(50, 0);
 
 // Loop Parameters
-#define OUTPUT_TIME 1000 // 2 measurements printed per second
-unsigned long loop_output = 0;
+#define OUTPUT_TIME             1000 // measurements print period
+unsigned long loop_output =        0;
 #define WIFI_CHECK_TIME       300000
-unsigned long loop_wifi = 0;
+unsigned long loop_wifi   =        0;
 
 // Display Setup
 CRGB leds[NUM_LEDS];
@@ -43,7 +40,8 @@ CRGB leds[NUM_LEDS];
 void setup() {
   // Setup Serial
   Serial.begin(115200);
-  Serial.println("Starting sketch");
+  Serial.println();
+  Serial.print("Starting sketch, version: "); Serial.println(SKETCH_VERSION);
   Serial.println();
 
   // Setup LittleFS

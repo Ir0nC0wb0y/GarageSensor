@@ -3,11 +3,13 @@
 #include <Filter.h>
 #include "Settings.h"
 
+
 // Display Data
 #define NUM_LEDS 24
 #define LED_DATA D5
 extern CRGB leds[NUM_LEDS];
 extern ExponentialFilter<float> SensorFilter;
+
 
 // Setting value Name Translation
 //STOP_LIMIT -> DIST_MIN      -> STATE5

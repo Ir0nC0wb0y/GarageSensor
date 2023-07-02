@@ -20,8 +20,8 @@ void DistSensor::SensorSetup() {
   }
   Serial.println("Sensor online!");
   distanceSensor.setDistanceModeLong();
-  distanceSensor.setTimingBudgetInMs(50);
-  distanceSensor.setIntermeasurementPeriod(50);
+  distanceSensor.setTimingBudgetInMs(SENSOR_TIMING_BUDGET);
+  distanceSensor.setIntermeasurementPeriod(SENSOR_INTER_PERIOD);
   distanceSensor.startRanging();
 }
 
@@ -43,9 +43,14 @@ void DistSensor::Do_Measurement(bool _initial) {
     distanceSensor.clearInterrupt();
   }
 
+  
   if (new_measurement) {
-    Do_Display(SensorFilter.Current());
+    //Do_Display(SensorFilter.Current());
+    Do_Display();
     new_measurement = false;
   }
+  
+  
+  //Maintain_Display();
 }
 

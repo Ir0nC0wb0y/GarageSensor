@@ -2,10 +2,13 @@
 #include "display.h"
 
 // Setup Variables
-  int distance_state = 0;
-  bool ds5_last               = false;
-  unsigned int ds5_flash_next =     0;
-  #define DS5_FLASH_TIME          250
+  int distance_state               =     0;
+  bool ds5_last                    = false;
+  unsigned int ds5_flash_next      =     0;
+  #define DS5_FLASH_TIME               250
+  unsigned int display_update_next =     0;
+  extern ExponentialFilter<float> SensorFilter;
+  #define DISPLAY_REFRESH  250  // display refresh rate in ms
 
 // Display 
 
@@ -99,8 +102,20 @@ void Set_Distance_State(float dist_compare) {
 
 }
 
-void Do_Display(float sensor_value) {
+void Maintain_Display() {
+  if (millis() >= display_update_next) {
+    display_update_next = millis() + DISPLAY_REFRESH;
+    Do_Display();
+  }
+}
+
+void Do_Display() {
+  //Serial.print("Updating Display, value: ");
+  float sensor_value = SensorFilter.Current();
+  //Serial.print(sensor_value);
   Set_Distance_State(sensor_value);
+  //Serial.print(", state: ");
+    //Serial.print(distance_state);
   int led_good = 0;
   float x_adj = 0.0;
   switch (distance_state) {
@@ -175,6 +190,7 @@ void Do_Display(float sensor_value) {
       break;
   }
   FastLED.show();
+  //Serial.println("...Done!");
 }
 
 void rainbow_show(unsigned int rainbow_duration, int thisSpeed, int deltaHue) {
