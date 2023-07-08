@@ -15,7 +15,7 @@
 
   // Display refresh rate
   unsigned long display_refresh_last =    0;
-  #define DISPLAY_REFRESH              100  // display refresh rate in ms
+  #define DISPLAY_REFRESH               250  // display refresh rate in ms
   
   // Variables for turning off the display if no change in measurement
   unsigned long display_m_time      =     0;

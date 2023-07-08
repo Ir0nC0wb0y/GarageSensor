@@ -23,8 +23,8 @@ SettingsTest testy;
 DistSensor distSensor;
 
 // Initialize Filter
-ExponentialFilter<float> SensorFilter(50, 0);
-ExponentialFilter<float> SensorChange(25, 0);
+ExponentialFilter<float> SensorFilter(FILTER_WEIGHT_GOOD, 0);
+ExponentialFilter<float> SensorChange(FILTER_WEIGHT_GOOD/2, 0);
 
 // Loop Parameters
 #define OUTPUT_TIME             1000 // measurements print period

@@ -119,19 +119,19 @@ bool Settings::SetSetting(const char * setting, float setting_value) {
   } else if (strcmp(setting,PARAM_GOOD_END) == 0) {
     if (setting_value != GoodEnd && setting_value != 0) {
       GoodEnd = setting_value;
-      writeFile(LittleFS, DIR_OK_END, String(GoodEnd).c_str());
+      writeFile(LittleFS, DIR_GOOD_END, String(GoodEnd).c_str());
       setting_update = true;
     }
   } else if (strcmp(setting,PARAM_GOOD_START) == 0) {
     if (setting_value != GoodStart && setting_value != 0) {
       GoodStart = setting_value;
-      writeFile(LittleFS, DIR_OK_END, String(GoodStart).c_str());
+      writeFile(LittleFS, DIR_GOOD_START, String(GoodStart).c_str());
       setting_update = true;
     }
   } else if (strcmp(setting,PARAM_FAR_START) == 0) {
     if (setting_value != FarStart && setting_value != 0) {
       FarStart = setting_value;
-      writeFile(LittleFS, DIR_OK_END, String(FarStart).c_str());
+      writeFile(LittleFS, DIR_FAR_START, String(FarStart).c_str());
       setting_update = true;
     }
   } else if (strcmp(setting,PARAM_TIMEOUT) == 0) {

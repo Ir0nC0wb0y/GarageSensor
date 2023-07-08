@@ -13,6 +13,9 @@ extern ExponentialFilter<float> SensorChange;
 #define SENSOR_TIMING_BUDGET 50
 #define SENSOR_INTER_PERIOD  50
 
+#define FILTER_WEIGHT_GOOD   50
+#define FILTER_WEIGHT_POOR    5
+
 class DistSensor {
   public:
     DistSensor();
