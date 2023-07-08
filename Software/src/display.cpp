@@ -1,14 +1,27 @@
-#include "common.h"
 #include "display.h"
+#include "common.h"
 
 // Setup Variables
+  // import from other modules
+  extern ExponentialFilter<float> SensorFilter;
+  extern ExponentialFilter<float> SensorChange;
+  extern Settings settings;
+
+  // Basic Deisplay parameters
   int distance_state               =     0;
   bool ds5_last                    = false;
   unsigned int ds5_flash_next      =     0;
   #define DS5_FLASH_TIME               250
-  unsigned int display_update_next =     0;
-  extern ExponentialFilter<float> SensorFilter;
-  #define DISPLAY_REFRESH  250  // display refresh rate in ms
+
+  // Display refresh rate
+  unsigned long display_refresh_last =    0;
+  #define DISPLAY_REFRESH              100  // display refresh rate in ms
+  
+  // Variables for turning off the display if no change in measurement
+  unsigned long display_m_time      =     0;
+  //float display_m_last             =   0.0;
+  #define DISPLAY_M_THRESH             0.25 // this requires a minimum speed of thresh/refresh [in/ms]
+  //#define DISPLAY_M_TIME            300000
 
 // Display 
 
@@ -23,7 +36,7 @@ float rng_a[4] = {0.0, 0.0, 0.0, 0.0};
 void Display_Setup() {
   Serial.println("Setting  up display");
   FastLED.addLeds<WS2812B, LED_DATA, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(10);
+  FastLED.setBrightness(100);
   // Sets all LED's to one color (Black)
   for ( int i = 0; i <= NUM_LEDS-1; i++) {
     leds[i] = CRGB::Black;
@@ -102,95 +115,167 @@ void Set_Distance_State(float dist_compare) {
 
 }
 
-void Maintain_Display() {
-  if (millis() >= display_update_next) {
-    display_update_next = millis() + DISPLAY_REFRESH;
-    Do_Display();
+
+void Display_State0(float sensor_value) {
+  //Serial.print("Distance state 0");
+  for ( int i = 0; i <= NUM_LEDS-1; i++) {
+      leds[i] = CRGB::STATE_COLOR_1;
+      //Serial.print(".");
   }
+  FastLED.show();
+  //Serial.println("complete!");
+}
+
+void Display_State1(float sensor_value) {
+  //Serial.print("Distance state 1");
+  float x_adj = sensor_value - settings.GoodStart;
+  int led_good = (rng_a[0] * pow(x_adj,3) + rng_b[0] * pow(x_adj,2) + rng_c[0] * x_adj + rng_d[0]);
+  for ( int i = 0; i <= NUM_LEDS-1; i++) {
+    if (i < led_good) {
+      leds[i] = CRGB::STATE_COLOR_1;
+    } else {
+      leds[i] = CRGB::STATE_COLOR_2;
+    }
+    //Serial.print(".");
+  }
+  FastLED.show();
+  //Serial.println("complete!");
+}
+
+void Display_State2(float sensor_value) {
+  //Serial.print("Distance state 2");
+  float x_adj = sensor_value - settings.GoodEnd;
+  int led_good = (rng_a[1] * pow(x_adj,3) + rng_b[1] * pow(x_adj,2) + rng_c[1] * x_adj + rng_d[1]);
+  for ( int i = 0; i <= NUM_LEDS-1; i++) {
+    if (i < led_good) {
+      leds[i] = CRGB::STATE_COLOR_2;
+    } else {
+      leds[i] = CRGB::STATE_COLOR_3;
+    }
+    //Serial.print(".");
+  }
+  FastLED.show();
+  //Serial.println("complete!");
+}
+
+void Display_State3(float sensor_value) {
+  //Serial.print("Distance state 3");
+  float x_adj = sensor_value - settings.OkEnd;
+  int led_good = (rng_a[2] * pow(x_adj,3) + rng_b[2] * pow(x_adj,2) + rng_c[2] * x_adj + rng_d[2]);
+  for ( int i = 0; i <= NUM_LEDS-1; i++) {
+    if (i < led_good) {
+      leds[i] = CRGB::STATE_COLOR_3;
+    } else {
+      leds[i] = CRGB::STATE_COLOR_4;
+    }
+    //Serial.print(".");
+  }
+  FastLED.show();
+  //Serial.println("complete!");
+}
+
+void Display_State4(float sensor_value) {
+  //Serial.print("Distance state 4");
+  float x_adj = sensor_value - settings.StopLimit;
+  int led_good = (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
+  for ( int i = 0; i <= NUM_LEDS-1; i++) {
+    if (i < led_good) {
+      leds[i] = CRGB::STATE_COLOR_4;
+    } else {
+      leds[i] = CRGB::STATE_COLOR_5_ON;
+    }
+    //Serial.print(".");
+  }
+  FastLED.show();
+  //Serial.println("complete!");
+}
+
+void Display_State5(float sensor_value) {
+  //Serial.print("Distance state 5");
+  if (ds5_last) {
+    for ( int i = 0; i <= NUM_LEDS-1; i++) {
+      leds[i] = CRGB::STATE_COLOR_5_ON;
+      //Serial.print(".");
+    }
+  } else {
+    for ( int i = 0; i <= NUM_LEDS-1; i++) {
+      leds[i] = CRGB::STATE_COLOR_5_OFF;
+      //Serial.print(".");
+    }
+  }
+  if (millis() >= ds5_flash_next) {
+    ds5_last = !ds5_last;
+    ds5_flash_next = millis() + DS5_FLASH_TIME;
+  }
+  FastLED.show();
+  //Serial.println("complete!");
 }
 
 void Do_Display() {
-  //Serial.print("Updating Display, value: ");
+  // Do logic for refresh
+  bool display_refresh = false;
+  if (millis() - display_refresh_last >= DISPLAY_REFRESH) {
+    display_refresh = true;
+    //Serial.print("Time since last display: ");
+      //Serial.println(millis() - display_refresh_last);
+    display_refresh_last = millis();
+  } else {
+    return;
+  }
+
   float sensor_value = SensorFilter.Current();
-  //Serial.print(sensor_value);
-  Set_Distance_State(sensor_value);
-  //Serial.print(", state: ");
-    //Serial.print(distance_state);
-  int led_good = 0;
-  float x_adj = 0.0;
-  switch (distance_state) {
-    case 0:
-      for ( int i = 0; i <= NUM_LEDS-1; i++) {
-          leds[i] = CRGB::STATE_COLOR_1;
-      }
-      break;
-    case 1:
-      x_adj = sensor_value - settings.GoodStart;
-      led_good = (rng_a[0] * pow(x_adj,3) + rng_b[0] * pow(x_adj,2) + rng_c[0] * x_adj + rng_d[0]);
-      for ( int i = 0; i <= NUM_LEDS-1; i++) {
-        if (i < led_good) {
-          leds[i] = CRGB::STATE_COLOR_1;
-        } else {
-          leds[i] = CRGB::STATE_COLOR_2;
-        }
-      }
-      break;
-    case 2:
-      x_adj = sensor_value - settings.GoodEnd;
-      led_good = (rng_a[1] * pow(x_adj,3) + rng_b[1] * pow(x_adj,2) + rng_c[1] * x_adj + rng_d[1]);
-      for ( int i = 0; i <= NUM_LEDS-1; i++) {
-        if (i < led_good) {
-          leds[i] = CRGB::STATE_COLOR_2;
-        } else {
-          leds[i] = CRGB::STATE_COLOR_3;
-        }
-      }
-      break;
-    case 3:
-      x_adj = sensor_value - settings.OkEnd;
-      led_good = (rng_a[2] * pow(x_adj,3) + rng_b[2] * pow(x_adj,2) + rng_c[2] * x_adj + rng_d[2]);
-      for ( int i = 0; i <= NUM_LEDS-1; i++) {
-        if (i < led_good) {
-          leds[i] = CRGB::STATE_COLOR_3;
-        } else {
-          leds[i] = CRGB::STATE_COLOR_4;
-        }
-      }
-      break;
-    case 4:
-      x_adj = sensor_value - settings.StopLimit;
-      led_good = (rng_a[3] * pow(x_adj,3) + rng_b[3] * pow(x_adj,2) + rng_c[3] * x_adj + rng_d[3]);
-      for ( int i = 0; i <= NUM_LEDS-1; i++) {
-        if (i < led_good) {
-          leds[i] = CRGB::STATE_COLOR_4;
-        } else {
-          leds[i] = CRGB::STATE_COLOR_5_ON;
-        }
-      }
-      break;
-    case 5:
-      if (ds5_last) {
-        for ( int i = 0; i <= NUM_LEDS-1; i++) {
-          leds[i] = CRGB::STATE_COLOR_5_ON;
-        }
+  // Do logic for measurement change
+  bool display_m = false;
+  //Serial.print("Filtered sensor change: ");
+    //Serial.println(SensorChange.Current());
+  if (abs(SensorChange.Current()) > DISPLAY_M_THRESH) {
+    display_m = true;
+    if (display_m_time != 0) {
+      display_m_time = 0;
+      Serial.println("Cleared display timeout");
+    }
+  } else {
+    if (display_m_time != 0) {
+      if (millis() - display_m_time <= settings.Timeout_ms) {
+        display_m = true;
+        //Serial.print("Display timout in ");
+          //Serial.println(millis() - display_m_time);
       } else {
+        //Serial.println("Display timed out due to measurement change");
         for ( int i = 0; i <= NUM_LEDS-1; i++) {
-          leds[i] = CRGB::STATE_COLOR_5_OFF;
+          leds[i] = CRGB::Black;
         }
+        FastLED.show();
       }
-      if (millis() >= ds5_flash_next) {
-        ds5_last = !ds5_last;
-        ds5_flash_next = millis() + DS5_FLASH_TIME;
-      }
-      break;
-    default:
+    } else {
+      display_m = true;
+      display_m_time = millis();
+      Serial.println("Setting display timeout");
+    } 
+  }
+  
+  if (display_refresh && display_m) {
+    Set_Distance_State(sensor_value);
+    if (distance_state == 0) {
+      Display_State0(sensor_value);
+    } else if (distance_state == 1) {
+      Display_State1(sensor_value);
+    } else if (distance_state == 2) {
+      Display_State2(sensor_value);
+    } else if (distance_state == 3) {
+      Display_State3(sensor_value);
+    } else if (distance_state == 4) {
+      Display_State4(sensor_value);
+    } else if (distance_state == 5) {
+      Display_State5(sensor_value);
+    } else {
+      Serial.println("An error has occurred!");
       for ( int i = 0; i <= NUM_LEDS-1; i++) {
         leds[i] = CRGB::STATE_COLOR_ERR;
       }
-      break;
+      FastLED.show();
+    }
   }
-  FastLED.show();
-  //Serial.println("...Done!");
 }
 
 void rainbow_show(unsigned int rainbow_duration, int thisSpeed, int deltaHue) {

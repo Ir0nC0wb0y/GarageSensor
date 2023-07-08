@@ -53,6 +53,12 @@ const char index_html[] PROGMEM = R"rawliteral(
     <input type="submit" value="Submit" onclick="submitMessage()">
   </form>
   <br></br>
+  <p>The display will turn off after the Timeout (in minutes):</p>
+  <form action="/get" target="hidden-form">
+    Timout (current value %Timeout%): <input type="number " name="Timeout">
+    <input type="submit" value="Submit" onclick="submitMessage()">
+  </form>
+  <br></br>
   <p>Adding 'default' to any of the entries above will reset that value to the defaults</p>
   <p>Adding 'reset' to any of the entries above will reset all values to the defaults</p>
   <iframe style="display:none" name="hidden-form"></iframe>

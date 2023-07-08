@@ -3,6 +3,8 @@
 #include "WiFi_Setup.h"
 #include "WiFi_Cred.h"
 
+#include "display.h"
+
 bool wifi_connected = false;
 #define WIFI_CONNECTION_MAX_TIME 10000
 

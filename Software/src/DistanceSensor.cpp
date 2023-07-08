@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "DistanceSensor.h"
+#include "display.h"
 
 DistSensor::DistSensor() {
   return;
@@ -37,20 +38,25 @@ void DistSensor::Do_Measurement(bool _initial) {
     int sensor_raw = distanceSensor.getDistance(); //Get the result of the measurement from the sensor
     if (!_initial) {
       SensorFilter.Filter(sensor_raw * SENSOR_CONVERSION);
+      SensorChange.Filter(sensor_last - SensorFilter.Current());
+      sensor_last = SensorFilter.Current();
     } else {
       SensorFilter.SetCurrent(sensor_raw * SENSOR_CONVERSION);
+      SensorChange.SetCurrent(0);
       }
     distanceSensor.clearInterrupt();
   }
 
-  
+  /*
   if (new_measurement) {
     //Do_Display(SensorFilter.Current());
     Do_Display();
+    //Maintain_Display();
     new_measurement = false;
   }
+  */
   
   
-  //Maintain_Display();
+  
 }
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <FastLED.h>
 #include <colorutils.h>
 #include <Filter.h>
@@ -18,7 +20,9 @@ extern ExponentialFilter<float> SensorFilter;
 //GOOD_START -> DIST_THRESH_1 -> STATE2
 //FAR_START  -> DIST_MAX      -> STATE1
 
+extern SettingsTest testy;
 extern Settings settings; // This is the new website configuration method
+
 
 #define STATE_COLOR_1     DarkBlue
 #define STATE_COLOR_2     Cyan

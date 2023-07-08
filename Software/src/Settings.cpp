@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include "Settings.h"
+#include "display.h"
+
+extern FS LittleFS;
 
 
 String readFile(fs::FS &fs, const char * path) {
@@ -62,12 +65,28 @@ void Settings::init() {
   //FAR_START
   FarStart  = _InitSetting(DIR_FAR_START,DEF_FAR_START);
 
+  //Timeout
+  Timeout   = _InitSetting(DIR_TIMEOUT,DEF_TIMEOUT);
+  Timeout_ms = (unsigned long) Timeout * 60 * 1000;
+
 }
 
 float Settings::_InitSetting(const char * settingDir, float settingDefault, bool forceDefault) {
   float setting_out = 0.0;
   if (LittleFS.exists(settingDir) && !forceDefault) {
     setting_out = readFile(LittleFS, settingDir).toFloat();
+  } else {
+    String setting = String(settingDefault);
+    writeFile(LittleFS, settingDir, setting.c_str());
+    setting_out = settingDefault;
+  }
+  return setting_out;
+}
+
+int Settings::_InitSetting_int(const char * settingDir, float settingDefault, bool forceDefault) {
+  float setting_out = 0.0;
+  if (LittleFS.exists(settingDir) && !forceDefault) {
+    setting_out = readFile(LittleFS, settingDir).toInt();
   } else {
     String setting = String(settingDefault);
     writeFile(LittleFS, settingDir, setting.c_str());
@@ -115,6 +134,14 @@ bool Settings::SetSetting(const char * setting, float setting_value) {
       writeFile(LittleFS, DIR_OK_END, String(FarStart).c_str());
       setting_update = true;
     }
+  } else if (strcmp(setting,PARAM_TIMEOUT) == 0) {
+    if (setting_value != Timeout && setting_value != 0) {
+      Timeout = setting_value;
+      Timeout_ms = (unsigned long) Timeout * 60 * 1000;
+      Serial.print("New timeout: "); Serial.println(Timeout_ms);
+      writeFile(LittleFS, DIR_TIMEOUT, String(Timeout).c_str());
+      //setting_update = true; // this is not needed as this is used to modify the display coefficients
+    }
   } else {
     Serial.print("Unexpected pameter: ");
       Serial.print(setting);
@@ -144,6 +171,10 @@ void Settings::ResetAll() {
 
   //FAR_START
   FarStart  = _InitSetting(DIR_FAR_START,DEF_FAR_START,true);
+
+  //Timeout
+  Timeout   = _InitSetting(DIR_TIMEOUT,DEF_TIMEOUT,true);
+  Timeout_ms = (unsigned long) Timeout * 60 * 1000;
   
   // Update Display parameters
   Set_Range_coefs();

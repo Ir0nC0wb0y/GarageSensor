@@ -17,12 +17,14 @@
 
 // Initialize Settings
 Settings settings;
+SettingsTest testy;
 
 // Initialize Sensor
 DistSensor distSensor;
 
 // Initialize Filter
 ExponentialFilter<float> SensorFilter(50, 0);
+ExponentialFilter<float> SensorChange(25, 0);
 
 // Loop Parameters
 #define OUTPUT_TIME             1000 // measurements print period
@@ -93,6 +95,7 @@ void setup() {
 
 void loop() {
   distSensor.Do_Measurement();
+  Do_Display();
 
   if (millis() >= loop_wifi) {
     WiFi_Check();

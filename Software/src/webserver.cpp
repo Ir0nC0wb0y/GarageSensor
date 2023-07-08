@@ -1,14 +1,31 @@
 #include <Arduino.h>
 #include "webserver.h"
+#include "common.h"
+#include "Settings.h"
+#include "webpage_main.cpp"
 
 // Create variables
-int sensor_val_last = SensorFilter.Current();
-unsigned long webpage_update_sensor = 0;
-int webpage_update_sensor_skip      = 0;
-unsigned long webpage_update_ping   = 0;
-#define WEBPAGE_UPDATE_SENSOR         500
-#define WEBPAGE_SENSOR_SKIP_THRESH    5
-#define WEBPAGE_UPDATE_PING           5000
+  int sensor_val_last = SensorFilter.Current();
+  unsigned long webpage_update_sensor = 0;
+  int webpage_update_sensor_skip      = 0;
+  unsigned long webpage_update_ping   = 0;
+  #define WEBPAGE_UPDATE_SENSOR         500
+  #define WEBPAGE_SENSOR_SKIP_THRESH    5
+  #define WEBPAGE_UPDATE_PING           5000
+
+// Pull in external variables
+  extern AsyncWebServer server;
+  extern AsyncEventSource events;
+  extern const char index_html[]; // This is the mainpage, from webpage_main.cpp
+  extern Settings settings;
+  // Sensor
+  
+  extern int sensor_val_last;
+  extern int sensor_change;
+  #define SENSOR_MIN_CHANGE   1.0
+
+  #define OTA_USERNAME ""
+  #define OTA_PASSWORD ""
 
 // Webserver Initiation
   // Create AsyncWebServer object on port 80
@@ -40,6 +57,8 @@ String processor(const String& var){
     return String(settings.FarStart);
   } else if(var == "SensorValue"){
     return String(SensorFilter.Current());
+  } else if(var == "Timeout"){
+    return String(settings.Timeout);
   }
   return String();
 }
@@ -134,6 +153,19 @@ void webserver_setup() {
         return;
       }
       settings.SetSetting(PARAM_FAR_START,inputMessage.toFloat());
+    } else if (request->hasParam(PARAM_TIMEOUT)) {
+      Serial.println("Got a parameter including timout");
+      inputMessage = request->getParam(PARAM_TIMEOUT)->value();
+      if (inputMessage == "default") {
+        inputMessage = String(DEF_TIMEOUT);
+        Serial.println("Setting StopLimit to Default");
+      }
+      if (inputMessage == "reset") {
+        settings.ResetAll();
+        Serial.println("Setting all values to Default");
+        return;
+      }
+      settings.SetSetting(PARAM_TIMEOUT,inputMessage.toFloat());
     } else {
       //Serial.println(inputMessage);
       Serial.print("unexpected input message parameter");
