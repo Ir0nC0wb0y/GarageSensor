@@ -20,7 +20,6 @@ extern ExponentialFilter<float> SensorFilter;
 //GOOD_START -> DIST_THRESH_1 -> STATE2
 //FAR_START  -> DIST_MAX      -> STATE1
 
-extern SettingsTest testy;
 extern Settings settings; // This is the new website configuration method
 
 

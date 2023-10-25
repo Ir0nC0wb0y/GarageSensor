@@ -30,12 +30,6 @@
 
 //enum SettingNames {StopLimit, OkEnd, GoodEnd, GoodStart, FarStart};
 
-class SettingsTest {
-  public:
-    bool settings_test = false;
-};
-
-
 class Settings {
   public:
     float StopLimit = 0.0;

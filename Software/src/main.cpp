@@ -2,38 +2,39 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define SKETCH_VERSION "0.2.1"
-
 // Internal Modules
   #include "common.h"
   #include "display.h"
   #include "DistanceSensor.h"
+  #include "OLED_display.h"
   #include "Settings.h"
   #include "WiFi_Setup.h"
 
 // Setup I2C Bus (Wire)
-#define SENSOR_SCL D1
-#define SENSOR_SDA D2
+  #define SENSOR_SCL D1
+  #define SENSOR_SDA D2
 
 // Initialize Settings
-Settings settings;
-SettingsTest testy;
+  Settings settings;
 
 // Initialize Sensor
-DistSensor distSensor;
+  DistSensor distSensor;
+
+// Initialize OLED Display
+  OLED_Display oled;
 
 // Initialize Filter
-ExponentialFilter<float> SensorFilter(FILTER_WEIGHT_GOOD, 0);
-ExponentialFilter<float> SensorChange(FILTER_WEIGHT_GOOD/2, 0);
+  ExponentialFilter<float> SensorFilter(FILTER_WEIGHT_GOOD, 0);
+  ExponentialFilter<float> SensorChange(FILTER_WEIGHT_GOOD, 0);
 
 // Loop Parameters
-#define OUTPUT_TIME             1000 // measurements print period
-unsigned long loop_output =        0;
-#define WIFI_CHECK_TIME       300000
-unsigned long loop_wifi   =        0;
+  #define OUTPUT_TIME             1000 // measurements print period
+  unsigned long loop_output =        0;
+  #define WIFI_CHECK_TIME       300000
+  unsigned long loop_wifi   =        0;
 
 // Display Setup
-CRGB leds[NUM_LEDS];
+  CRGB leds[NUM_LEDS];
 
 // Initialize Webserver
   #include "webserver.h"
@@ -42,8 +43,6 @@ CRGB leds[NUM_LEDS];
 void setup() {
   // Setup Serial
   Serial.begin(115200);
-  Serial.println();
-  Serial.print("Starting sketch, version: "); Serial.println(SKETCH_VERSION);
   Serial.println();
 
   // Setup LittleFS
@@ -61,6 +60,11 @@ void setup() {
   Serial.println("Setting up Settings");
   settings.init();
   Serial.println();
+
+  // Setup OLED
+  Serial.println("Setting up OLED Display");
+  oled.Setup();
+  //oled.ShowIP("192.168.10.100");
 
   // Setup Display
   Display_Setup();
@@ -96,6 +100,7 @@ void setup() {
 void loop() {
   distSensor.Do_Measurement();
   Do_Display();
+  oled.Display(SensorFilter.Current(),SensorChange.Current());
 
   if (millis() >= loop_wifi) {
     WiFi_Check();
