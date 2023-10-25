@@ -112,7 +112,11 @@ void loop() {
   }
 
   if (millis() >= loop_output) {
-    Serial.print("Distance(in): ");  Serial.println(SensorFilter.Current(), 1);
+    Serial.print("Distance(in): ");
+      Serial.print(SensorFilter.Current(), 1);
+      Serial.print("   Speed (in/s): ");
+      Serial.print(SensorChange.Current(), 3);
+      Serial.println();
     loop_output = millis() + OUTPUT_TIME;
   }
 

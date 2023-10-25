@@ -20,7 +20,7 @@
   // Variables for turning off the display if no change in measurement
   unsigned long display_m_time      =     0;
   //float display_m_last             =   0.0;
-  #define DISPLAY_M_THRESH             0.25 // this requires a minimum speed of thresh/refresh [in/ms]
+  #define DISPLAY_M_THRESH             2.0 // this requires a minimum speed of thresh/refresh [in/ms]
   //#define DISPLAY_M_TIME            300000
 
 // Display 
@@ -232,7 +232,10 @@ void Do_Display() {
     display_m = true;
     if (display_m_time != 0) {
       display_m_time = 0;
-      Serial.println("Cleared display timeout");
+      Serial.print("Cleared display timeout");
+        Serial.print("  Speed(in/s): ");
+        Serial.print(SensorChange.Current());
+        Serial.println();
     }
   } else {
     if (display_m_time != 0) {

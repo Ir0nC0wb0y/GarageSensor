@@ -53,7 +53,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <input type="submit" value="Submit" onclick="submitMessage()">
   </form>
   <br></br>
-  <p>The display will turn off after the Timeout (in minutes):</p>
+  <p>The display will turn off after the Timeout (in seconds):</p>
   <form action="/get" target="hidden-form">
     Timout (current value %Timeout%): <input type="number " name="Timeout">
     <input type="submit" value="Submit" onclick="submitMessage()">

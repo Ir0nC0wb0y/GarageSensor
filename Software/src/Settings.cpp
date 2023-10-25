@@ -67,7 +67,7 @@ void Settings::init() {
 
   //Timeout
   Timeout   = _InitSetting(DIR_TIMEOUT,DEF_TIMEOUT);
-  Timeout_ms = (unsigned long) Timeout * 60 * 1000;
+  Timeout_ms = (unsigned long) Timeout * 1000;
 
 }
 
@@ -137,7 +137,7 @@ bool Settings::SetSetting(const char * setting, float setting_value) {
   } else if (strcmp(setting,PARAM_TIMEOUT) == 0) {
     if (setting_value != Timeout && setting_value != 0) {
       Timeout = setting_value;
-      Timeout_ms = (unsigned long) Timeout * 60 * 1000;
+      Timeout_ms = (unsigned long) (Timeout * 1000);
       Serial.print("New timeout: "); Serial.println(Timeout_ms);
       writeFile(LittleFS, DIR_TIMEOUT, String(Timeout).c_str());
       //setting_update = true; // this is not needed as this is used to modify the display coefficients

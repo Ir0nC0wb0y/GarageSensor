@@ -8,7 +8,7 @@
 
 #define SCROLL_TIME          2000 // Time to scroll text
 
-#define OLED_SHUTOFF_THRESH  0.75
+#define OLED_SHUTOFF_THRESH   2.0
 #define OLED_SHUTOFF_TIME   10000
 
 #define DISPLAY_RATE_VALUE    500 // Rate numberical value changes [ms]

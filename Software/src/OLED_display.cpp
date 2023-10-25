@@ -5,6 +5,7 @@
 #include <Adafruit_SSD1306.h>
 
 #include "OLED_display.h"
+#include "common.h"
 
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -115,14 +116,14 @@ void OLED_Display::Display(float Display_dist, float Display_speed) {
       //Serial.println("Set OLED Timeout");
       _time_shutoff = millis();
     } else {
-      if (millis() - _time_shutoff >= OLED_SHUTOFF_TIME) {
+      if (millis() - _time_shutoff >= settings.Timeout_ms) {
         if (_oled_state == true) {
           _OLED_Power(false);
           
           // clear graph history
-          for (int i = 0; i < SCREEN_WIDTH; i++) {
-            _circularBuffer[i] = 0.0;
-          }
+          //for (int i = 0; i < SCREEN_WIDTH; i++) {
+          //  _circularBuffer[i] = 0.0;
+          //}
         }
         return;
       }
@@ -210,10 +211,14 @@ void OLED_Display::_Display_Value(float Display) {
 }
 
 void OLED_Display::_drawLine(int xPos, float Buffer_val){
-  //int lineHeight = map(analogVal, MIN_ANALOG_INPUT, MAX_ANALOG_INPUT, 0, _graphHeight);
-  int Buffer_val_int = mapf(Buffer_val, SENSOR_MIN_VALUE, SENSOR_MAX_VALUE, 0, _graphHeight);
+  //int Buffer_val_int = mapf(Buffer_val, SENSOR_MIN_VALUE, SENSOR_MAX_VALUE, 0, _graphHeight);
+  int Buffer_val_int = mapf(Buffer_val, settings.StopLimit, settings.FarStart, 0, _graphHeight);
   if (Buffer_val_int > _graphHeight) {
+    // when map gets too big
     Buffer_val_int = _graphHeight;
+  } else if (Buffer_val_int < 1) {
+    //when map gets too small
+    Buffer_val_int = 1;
   }
   int yPos = SCREEN_HEIGHT - Buffer_val_int;
   //display.drawFastVLine(xPos, yPos, Buffer_val_int, SSD1306_WHITE);
